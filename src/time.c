@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-uint64_t get_current_time_ms(void) {
+uint64_t get_time(t_time_code time_code) {
   struct timeval tv;
 
   if (gettimeofday(&tv, NULL))
