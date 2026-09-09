@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/09 16:10:14 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/09 16:41:27 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,17 @@
  *
 */
 
-static bool	same_string(char *str, char *copy)
+static int	ft_strncmp(const char *s1, const char *s2, int n)
 {
-	char	*start;
-	int		i;
-
-	i = 0;
-	start = str;
-	while (start++ == copy++ && start && copy)
-		i++;
-	if (i == (int)strlen(str) && i == (int)strlen(copy))
-		return true;
-	return false;
+	if (n == 0)
+		return (0);
+	while (*s1 && *s2 && n > 1 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+		n--;
+	}
+	return (unsigned char *)s1 == (unsigned char *)s2;
 }
 
 static bool	is_space(char c)
@@ -57,37 +56,25 @@ static const char	*valid_input(char *str)
 	int	i;
 	const char	*start;
 	bool	sign;
-	int		digit;
 
 	i = 0;
 	sign = false;
-	digit = 0;
-	while (str)
+	start = NULL;
+	while (*str)
 	{
-		if (*str >= '0' && *str <= '9')
-			if (i == 0)
-			{
-				start = str;
-				digit = 1;
-			}
-			if (digit < 2)
-				i++;
-		else
-			if (i > 0)
-				digit = 2;
-		if (is_space(*str))
-			str++;
-		else if (*str == '-')
+		if (*str == '-')
 			error_exit("No negative integers allowed.");
-		else if (*str == '+')
-			if (sign == true)
+		else if (*str == '+' && sign++)
 				error_exit("No double signs in arguments are allowed.");
-			else
-				str++;
 		else if (*str == '.')
 			error_exit("Only integers are allowed, no floats.");
+		else if (*str >= '0' && *str <= '9')
+			if (!start)
+				start = str;
+			i++;
+		str++;
 	}
-	if (i > 10)
+	if (i > 10 || (i == 10 && ft_strncmp(start, "2147483647", 10) > 0))
 		error_exit("All numeric arguments need to be <= INT_MAX.");
 	return start;
 }
@@ -96,7 +83,9 @@ static long	ft_atol(char *str)
 {
 	long	num;
 	const char	*start;
-
+	
+	while (is_space(*str))
+		str++;
 	start = valid_input(str);
 	num = 0;
 	while (*start >= '0' && *start <= '9')
@@ -114,7 +103,7 @@ static long	ft_atol(char *str)
 
 void	parse_input(t_data *data, char **av)
 {
-	if (!same_string(av[8], "fifo") || !same_string(av[8], "efi"))
+	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "efi") != 0)
 		error_exit("Invalid argument for 'scheduler':"
 				"please choose between 'fifo' and 'efi'.");
 	data->number_of_coders = ft_atol(av[1]);
