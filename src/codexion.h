@@ -6,12 +6,12 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/09 13:27:28 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/09 16:10:47 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h> // for printf, fprintf
-#include <unistdio.h> // for write, usleep
+#include <unistd.h> // for write, usleep
 #include <pthread.h> // for mutex: _init, _lock, _unlock, _destroy
 					// for threads: _create, _join
 					// for cond: _init, _wait, _timedwait, _signal, _broadcast, _destroy
@@ -20,12 +20,23 @@
 #include <sys/time.h> // for gettimeofday
 #include <stdbool.h>
 #include <stdint.h> // for booleans and uint64_t and INT_MAX
+#include <limits.h>
 
 /*
  * Global macros:
+ * ANSI colors for fprintf
+ * DEBUG_MODE (default = 0, if 1 will print more extensive logging)
 */
 
-#DEFINE DEBUG_MODE 0
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN    "\033[36m"
+#define RESET   "\033[0m"
+
+#define DEBUG_MODE 0
 
 /*
  * ENUM structures (for getting/setting and safe handling of threads/mutexes --> avoiding the overwriting errors by lock/unlock) as well as time
@@ -121,4 +132,8 @@ typedef struct s_data {
 
 
 // utils.c
-long	get_time(t_time_format time_format);
+long	get_time(t_time_format time_code);
+void	error_exit(char *exit_msg);
+
+// parser.c
+void	parse_input(t_data *data, char **av);
