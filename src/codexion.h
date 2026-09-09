@@ -1,4 +1,14 @@
-// #MY42HEADER HERE
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                    *        /\       *     */
+/*   codexion.h                                      \        /##\        /   */
+/*                                                    \      /####\      /    */
+/*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
+/*                                                        |X||##||X|          */
+/*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
+/*   Updated: 2026/09/09 13:27:28 by odschreu            ..+::##::+..         */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <stdio.h> // for printf, fprintf
 #include <unistdio.h> // for write, usleep
@@ -68,14 +78,15 @@ typedef struct s_coder {
   int id;
   int number_of_compiles;
   bool done;
-  uint64_t last_compile_start;
-  uint64_t time_to_burnout;
+  long last_compile_start;
+  long time_to_burnout;
   t_dongle *left_dongle;
   t_dongle *right_dongle;
   pthread_t thread_id;
+  t_mtx	coder_mutex;
   t_data *data;
 
-} t_coder;
+}		t_coder;
 
 typedef struct s_data {
 
@@ -89,10 +100,12 @@ typedef struct s_data {
   char *scheduler;
   long start;
   bool quit;
+  t_mtx read_mtx;
+  t_mtx	write_mtx;
   t_coder *coders;
   t_dongle *dongles;
 
-} t_data;
+}		t_data;
 
 /*
  * For the functions:
@@ -107,5 +120,5 @@ typedef struct s_data {
 */
 
 
-// list of function definitions
-uint64_t get_current_time_ms(void);
+// utils.c
+long	get_time(t_time_format time_format);
