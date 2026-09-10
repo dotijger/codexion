@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:17:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/09 15:56:29 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/10 17:57:29 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ int	main(int ac, char **av)
     // 1 parsing input
     parse_input(&data_table, av);
     // 2 creating data table and coders and dongles
-    // codexion_init(&data_table);
+    codexion_init(&data_table);
     // 3 starting compiling simulation
-    // start_codexion(&data_table);
+	start_codexion(&data_table);
     // 4 cleaning everything up (no leaks)
     // clean_up(&data_table);
   }

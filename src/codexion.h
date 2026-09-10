@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/09 16:10:47 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/10 18:13:11 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@
  */
 
 typedef pthread_mutex_t t_mtx;
+typedef pthread_cond_t t_cond;
 
 typedef enum e_time_format
 {
@@ -59,8 +60,8 @@ typedef enum e_pthread_code
 	DESTROY,
 	CREATE,
 	JOIN,
+	DETACH,
 	WAIT,
-	TIMEDWAIT,
 	SIGNAL,
 	BROADCAST,
 }		t_pthread_code;
@@ -79,8 +80,13 @@ typedef struct s_data t_data; // IOU for the compiler (aka = we define this late
 
 typedef struct s_dongle {
 
-  pthread_mutex_t dongle;
+  t_mtx dongle_mtx;
+  t_cond dongle_cond;
   int dongle_id;
+  bool	taken;
+  bool	cooling_down;
+  long	release_time_in_ms;
+
 
 } t_dongle;
 
@@ -94,7 +100,7 @@ typedef struct s_coder {
   t_dongle *left_dongle;
   t_dongle *right_dongle;
   pthread_t thread_id;
-  t_mtx	coder_mutex;
+  t_mtx	coder_mtx;
   t_data *data;
 
 }		t_coder;
@@ -109,7 +115,7 @@ typedef struct s_data {
   long number_of_compiles_required;
   long dongle_cooldown;
   char *scheduler;
-  long start;
+  bool start;
   bool quit;
   t_mtx read_mtx;
   t_mtx	write_mtx;
@@ -136,4 +142,16 @@ long	get_time(t_time_format time_code);
 void	error_exit(char *exit_msg);
 
 // parser.c
-void	parse_input(t_data *data, char **av);
+void	parse_input(t_data *data_table, char **av);
+
+// init.c
+void	codexion_init(t_data *data_table);
+
+// safe_utils.c
+void	*safe_malloc(size_t size);
+void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code);
+void	safe_thread_handle(pthread_t *thread, void *(*start_routine)(void *), void *data, t_pthread_code code);
+void	safe_cond_handle(t_cond *cond, t_mtx *mtx, t_pthread_code code);
+
+// codexion.c
+void	codexion_start(t_data *data_table);

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/09 16:41:27 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/10 17:54:14 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,17 +101,17 @@ static long	ft_atol(char *str)
 }
 
 
-void	parse_input(t_data *data, char **av)
+void	parse_input(t_data *data_table, char **av)
 {
 	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "efi") != 0)
 		error_exit("Invalid argument for 'scheduler':"
 				"please choose between 'fifo' and 'efi'.");
-	data->number_of_coders = ft_atol(av[1]);
-	data->time_to_burnout = ft_atol(av[2]);
-	data->time_to_compile = ft_atol(av[3]);
-	data->time_to_debug = ft_atol(av[4]);
-	data->time_to_refactor = ft_atol(av[5]);
-	data->number_of_compiles_required = ft_atol(av[6]);
-	data->dongle_cooldown = ft_atol(av[7]);
-	data->scheduler = av[8];
+	data_table->number_of_coders = ft_atol(av[1]);
+	data_table->time_to_burnout = ft_atol(av[2]);
+	data_table->time_to_compile = ft_atol(av[3]);
+	data_table->time_to_debug = ft_atol(av[4]);
+	data_table->time_to_refactor = ft_atol(av[5]);
+	data_table->number_of_compiles_required = ft_atol(av[6]);
+	data_table->dongle_cooldown = ft_atol(av[7]);
+	data_table->scheduler = av[8];
 }
