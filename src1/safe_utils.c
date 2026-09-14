@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:57:35 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 12:24:45 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/10 17:56:42 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	*safe_malloc(size_t size)
 	return pointer;
 }
 
-void	safe_mutex_handle(t_mtx *mtx, e_pthread_code code)
+void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code)
 {
 	int	status;
 
@@ -48,7 +48,7 @@ void	safe_mutex_handle(t_mtx *mtx, e_pthread_code code)
 		error_exit("Fatal mutex error, exiting program.");
 }
 
-void	safe_cond_handle(t_cond *cond, t_mtx *mtx, e_pthread_code code)
+void	safe_cond_handle(t_cond *cond, t_mtx *mtx, t_pthread_code code)
 {
 	int	status;
 
@@ -71,7 +71,7 @@ void	safe_thread_handle(
 			pthread_t *thread,
 			void *(*start_routine)(void *),
 			void *data,
-			e_pthread_code code
+			t_pthread_code code
 			)
 {
 	int	status;

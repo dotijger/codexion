@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:45:26 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/11 16:01:59 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,51 +36,36 @@
 #define CYAN    "\033[36m"
 #define RESET   "\033[0m"
 
+#define DEBUG_MODE 0
+
 /*
  * ENUM structures (for getting/setting and safe handling of threads/mutexes --> avoiding the overwriting errors by lock/unlock) as well as time
  */
 
 typedef pthread_mutex_t t_mtx;
 typedef pthread_cond_t t_cond;
+typedef struct timespec timespec;
 
-typedef enum	e_scheduler
-{
-	FIFO,
-	EDF,
-
-}	t_scheduler;
-
-typedef enum	e_time_format
+typedef enum e_time_format
 {
 	SECOND,
 	MILLISECOND,
 	MICROSECOND,
-
 }		t_time_format;
 
-typedef struct	s_request
+typedef enum e_pthread_code
 {
-	long	arrival_time;
-	long	deadline_time;
-	int		coder_id;
-
-}	t_request;
-
-
-typedef struct	s_node
-{
-	t_request	request;
-	t_node		*next;
-
-}	t_node;
-
-typedef struct	s_queue
-{
-	t_node	*head;
-	int		size;
-	int		(*cmp)(t_request, t_request);
-
-}	t_queue;
+	INIT,
+	LOCK,
+	UNLOCK,
+	DESTROY,
+	CREATE,
+	JOIN,
+	DETACH,
+	WAIT,
+	SIGNAL,
+	BROADCAST,
+}		t_pthread_code;
 
 /*
  * For the structures:
@@ -96,43 +81,46 @@ typedef struct s_data t_data; // IOU for the compiler (aka = we define this late
 
 typedef struct s_dongle {
 
-  t_mtx		dongle_mtx;
-  t_cond	dongle_cond;
-  int		dongle_id;
-  bool		taken;
-  long		release_time_in_ms;
+  t_mtx dongle_mtx;
+  t_cond dongle_cond;
+  int dongle_id;
+  bool	taken;
+  bool	cooling_down;
+  long	release_time_in_ms;
+
 
 } t_dongle;
 
 typedef struct s_coder {
 
-  int 		coder_id;
-  int 		compiles;
-  long		last_compile_start;
-  long 		time_to_burnout;
-  pthread_t thread;
-  t_mtx		coder_mtx;
-  t_data 	*data_table;
+  int id;
+  int number_of_compiles;
+  bool done;
+  long last_compile_start;
+  long time_to_burnout;
+  t_dongle *left_dongle;
+  t_dongle *right_dongle;
+  pthread_t thread_id;
+  t_mtx	coder_mtx;
+  t_data *data_table;
 
 }		t_coder;
 
 typedef struct s_data {
 
-  long		number_of_coders;
-  long 		time_to_burnout;
-  long 		time_to_compile;
-  long 		time_to_debug;
-  long 		time_to_refactor;
-  long 		compiles_required;
-  long 		dongle_cooldown;
-  char 		*scheduler;
-  long		start_time;
-  pthread_t	monitor;
-  bool 		running;
-  t_mtx 	log_mtx;
-  t_mtx		table_mtx;
-  t_coder 	*coders;
-  t_dongle 	*dongles;
+  long number_of_coders;
+  long time_to_burnout;
+  long time_to_compile;
+  long time_to_debug;
+  long time_to_refactor;
+  long number_of_compiles_required;
+  long dongle_cooldown;
+  char *scheduler;
+  bool start;
+  bool finished;
+  t_mtx table_mtx;
+  t_coder *coders;
+  t_dongle *dongles;
 
 }		t_data;
 
@@ -148,42 +136,10 @@ typedef struct s_data {
  *
 */
 
+
 // utils.c
+long	get_time(t_time_format time_code);
 void	error_exit(char *exit_msg);
-void	log_event(t_mtx, *mtx, char *event)
-long	get_time(e_time_format time_code);
-void	precise_usleep(long usec, t_data *data_table);
-int		left(int i, int n);
-int		right(int i, int n);
-
-// coder_routine_utils.c
-void	debug(int i, t_data *data_table, long time_to_debug);
-void	refactor(int i, t_data *data_table, long time_to_refactor);
-void	compile(int i, t_data *data_table, long time_to_compile);
-void	acquire_dongles(int i, t_data *data_table);
-void	put_dongles_back(int i, t_data *data_table);
-void	test(int i, t_data *data_table);
-
-// routine.c
-void	coding_routine(void *arg);
-void	monitor_routine(void *arg);
-
-
-// queue.c
-
-
-// scheduler.c
-int	fifo_cmp(t_request a, t_request b);
-int	edf_cmp(t_request a, t_request b);
-
-// dongle_utils.c
-
-
-// safe_utils.c
-void	*safe_malloc(size_t size);
-void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code);
-void	safe_thread_handle(pthread_t *thread, void *(*start_routine)(void *), void *data, t_pthread_code code);
-void	safe_cond_handle(t_cond *cond, t_mtx *mtx, timespec time, t_pthread_code code);
 
 // parser.c
 void	parse_input(t_data *data_table, char **av);
@@ -191,5 +147,11 @@ void	parse_input(t_data *data_table, char **av);
 // init.c
 void	codexion_init(t_data *data_table);
 
-// run.c
-void	codexion(t_data *data_table);
+// safe_utils.c
+void	*safe_malloc(size_t size);
+void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code);
+void	safe_thread_handle(pthread_t *thread, void *(*start_routine)(void *), void *data, t_pthread_code code);
+void	safe_cond_handle(t_cond *cond, t_mtx *mtx, timespec time, t_pthread_code code);
+
+// codexion.c
+void	codexion_start(t_data *data_table);

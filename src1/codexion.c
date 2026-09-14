@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 17:57:43 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/10 18:17:31 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/11 15:47:58 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ static void	coding_routine(t_data *data_table)
 	while (!data_table->start)
 		;
 	// start routine:
-	// try to compile
+	// try to compile (acquire the dongles! >> hold_and_wait.c)
+	
 	// debug for debug time (ms)
 	// refactor for refactor time (ms)
 }

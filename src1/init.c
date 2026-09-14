@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:44:38 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/11 16:02:08 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,19 @@ static void	assign_dongles(t_data *data_table, int i)
 static void	init_coder(t_data *data_table, int i)
 {
 	data_table->coders[i].id = i + 1;
-	data_table->coders[i].compiles = 0;
+	data_table->coders[i].number_of_compiles = 0;
+	data_table->coders[i].done = false;
 	data_table->coders[i].data_table = data_table;
-	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
-	data_table->coders[i].time_to_burnout = get_time(MILLISECOND) + data_table.time_to_burnout;
 	assign_dongles(data_table, i);
 	safe_mutex_handle(&data_table->coders[i].coder_mtx, INIT);
+	// TODO: last_compile_start and time_to_burnout have not been initialized (!)
 }
 
 static void	init_dongle(t_data *data_table, int i)
 {
 	data_table->dongles[i].dongle_id = i;
 	data_table->dongles[i].taken = false;
+	data_table->dongles[i].cooling_down = false;
 	safe_mutex_handle(&data_table->dongles[i].dongle_mtx, INIT);
 	safe_cond_handle(&data_table->dongles[i].dongle_cond, NULL, INIT);
 }
@@ -51,12 +52,8 @@ void	codexion_init(t_data *data_table)
 {
 	int	i;
 
-	if (data_table->scheduler == FIFO)
-		init_queue(fifo_cmp);
-	else
-		init_queue(edf_cmp);
-	data_table->running = false;
-	data_table->start_time = 0;
+	data_table->start = false;
+	data_table->finished = false;
 	data_table->coders = (t_coder *)safe_malloc(sizeof(t_coder) * data_table->number_of_coders);
 	data_table->dongles = (t_dongle *)safe_malloc(sizeof(t_dongle) * data_table->number_of_coders);
 	i = -1;

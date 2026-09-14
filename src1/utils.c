@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:25:10 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/11 15:49:09 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,14 @@ void	error_exit(char *exit_msg)
 	exit(EXIT_FAILURE);
 }
 
-/* Logging function (to print the statements)
+/*
+ * Logging function (to print the statements)
  *
 */
 
-void	log_event(t_data *data_table, int id, char *event)
+void	log_event(char *event)
 {
-	safe_mutex_handle(&data_table->log_mtx, LOCK);
-	printf("%lu %d %s\n", get_time(MILLISECOND) - data_table->start_time, id, event);
-	safe_mutex_handle(mtx, UNLOCK);
+	printf("%s\n", event);
 }
 
 /*
@@ -42,7 +41,7 @@ void	log_event(t_data *data_table, int id, char *event)
  * 			- TLDR: tv_sec fives time, usec gives fractional remainder of current s
 */
 
-long get_time(e_time_format time_format)
+long get_time(t_time_format time_format)
 {
 	struct timeval	tv;
 
@@ -88,16 +87,4 @@ void	precise_usleep(long usec, t_data *data_table)
 	}
 }
 
-/*
- * Functions to get the left and right positions of the coder
-*/ 
 
-int	left(int i, int n)
-{
-	return (i + 1 + n % n);
-}
-
-int	right(int i, int n)
-{
-	return (i - 1 + n % n);
-}
