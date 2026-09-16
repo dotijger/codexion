@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:44:38 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/16 13:49:54 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ static void	assign_dongles(t_data *data_table, int i)
 	int	n;
 
 	n = (int)data_table->number_of_coders;
-	data_table->coders[i].left_dongle = &data_table->dongles[i];
-	data_table->coders[i].right_dongle = &data_table->dongles[i - 1 + n % n];
+	data_table->coders[i].left = &data_table->dongles[i];
+	data_table->coders[i].right = &data_table->dongles[(i - 1 + n) % n];
 }
 
 static void	init_coder(t_data *data_table, int i)
@@ -34,17 +34,14 @@ static void	init_coder(t_data *data_table, int i)
 	data_table->coders[i].compiles = 0;
 	data_table->coders[i].data_table = data_table;
 	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
-	data_table->coders[i].time_to_burnout = get_time(MILLISECOND) + data_table.time_to_burnout;
+	data_table->coders[i].time_to_burnout = get_time(MILLISECOND) + data_table->time_to_burnout;
 	assign_dongles(data_table, i);
-	safe_mutex_handle(&data_table->coders[i].coder_mtx, INIT);
 }
 
 static void	init_dongle(t_data *data_table, int i)
 {
 	data_table->dongles[i].dongle_id = i;
 	data_table->dongles[i].taken = false;
-	safe_mutex_handle(&data_table->dongles[i].dongle_mtx, INIT);
-	safe_cond_handle(&data_table->dongles[i].dongle_cond, NULL, INIT);
 }
 
 void	codexion_init(t_data *data_table)
@@ -52,9 +49,9 @@ void	codexion_init(t_data *data_table)
 	int	i;
 
 	if (data_table->scheduler == FIFO)
-		init_queue(fifo_cmp);
+		init_heap(&data_table->heap, fifo_cmp);
 	else
-		init_queue(edf_cmp);
+		init_heap(&data_table->heap, edf_cmp);
 	data_table->running = false;
 	data_table->start_time = 0;
 	data_table->coders = (t_coder *)safe_malloc(sizeof(t_coder) * data_table->number_of_coders);
@@ -65,6 +62,9 @@ void	codexion_init(t_data *data_table)
 	i = -1;
 	while (++i < data_table->number_of_coders)
 		init_coder(data_table, i);
-	safe_mutex_handle(&data_table->read_mtx, CREATE);
-	safe_mutex_handle(&data_table->write_mtx, CREATE);
+	safe_cond_handle(&data_table->dongle_cond, NULL, NULL, CREATE);
+	safe_cond_handle(&data_table->monitor_cond, NULL, NULL, CREATE);
+	safe_mutex_handle(&data_table->log_mtx, CREATE);
+	safe_mutex_handle(&data_table->table_mtx, CREATE);
+	safe_mutex_handle(&data_table->dongle_mtx, CREATE);
 }

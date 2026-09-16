@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/15 09:52:29 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/16 13:43:23 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
  * ANSI colors for fprintf
  * DEBUG_MODE (default = 0, if 1 will print more extensive logging)
 */
+
+#define HEAP_CAPACITY 512
 
 #define RED     "\033[31m"
 #define GREEN   "\033[32m"
@@ -89,8 +91,6 @@ typedef struct s_data t_data; // IOU for the compiler (aka = we define this late
 
 typedef struct s_dongle {
 
-  t_mtx		dongle_mtx;
-  t_cond	dongle_cond;
   int		dongle_id;
   bool		taken;
   long		release_time_in_ms;
@@ -103,8 +103,9 @@ typedef struct s_coder {
   int 		compiles;
   long		last_compile_start;
   long 		time_to_burnout;
+  t_dongle	*left;
+  t_dongle	*right;
   pthread_t thread;
-  t_mtx		coder_mtx;
   t_data 	*data_table;
 
 }		t_coder;
@@ -122,8 +123,11 @@ typedef struct s_data {
   long		start_time;
   pthread_t	monitor;
   bool 		running;
+  t_cond	dongle_cond;
+  t_cond	monitor_cond;
   t_mtx 	log_mtx;
   t_mtx		table_mtx;
+  t_mtx		dongle_mtx;
   t_coder 	*coders;
   t_dongle 	*dongles;
 

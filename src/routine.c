@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 17:02:59 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/16 14:05:36 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,12 @@
 
 static bool	burned_out(t_coder *coders)
 {
+	long	now;
+
 	while (coders++)
 	{
-		if (coders->burned_out)
+		now = get_time(MILLISECOND);
+		if (coder->time_to_burnout < now)
 			return (true);
 	}
 	return (false);
@@ -26,7 +29,7 @@ static bool	done(t_coder *coders)
 {
 	while (coders++)
 	{
-		if (coders->number_of_compiles < coders->data_table->number_of_compiles_required)
+		if (coders->compiles < coders->data_table->compiles_required)
 			return (false);
 	}
 	return (true);
@@ -42,12 +45,12 @@ void	coding_routine(void *arg)
 	while (!data_table->running)
 		;
 
-	while (coder.number_of_compiles < data_table->number_of_compiles_required
+	while (coder.compiles < data_table->compiles_required
 			&& data_table->running)
 	{
-		acquire_dongles(i);
+		acquire_dongles(coder);
 		compile(i, data_table, coder.time_to_compile);
-		release_dongles(i);
+		release_dongles(coder);
 		debug(i, data_table, coder.time_to_debug);
 		refactor(i, data_table, coder.time_to_refactor);
 	}
@@ -63,8 +66,10 @@ void	monitor_routine(void *arg)
 	data_table->running = true;
 	data_table->start_time = get_time(MILLISECOND);
 	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
-	while (!burned_out(corders) || !done(coders))
-		;
+	while (data_table->running)
+	{
+		if 
+	}
 	safe_mutex_handle(&data_table->table_mtx, LOCK);
 	data_table->running = false;
 	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
