@@ -6,19 +6,19 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:37:21 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:59:15 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/15 09:11:18 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static void	swap(t_node *a, t_node *b)
+static void	swap(t_node **a, t_node **b)
 {
 	t_node	*tmp;
 
-	tmp = a;
-	a = b;
-	b = tmp;
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
 }
 
 static void	add_front(t_queue *queue, t_node *a)

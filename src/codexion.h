@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:45:26 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/15 09:52:29 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,21 +66,14 @@ typedef struct	s_request
 
 }	t_request;
 
-
-typedef struct	s_node
+typedef struct	s_heap
 {
-	t_request	request;
-	t_node		*next;
+	t_request	*queue;
+	int			size;
+	int			capacity;
+	int			(*cmp)(t_request, t_request);
 
-}	t_node;
-
-typedef struct	s_queue
-{
-	t_node	*head;
-	int		size;
-	int		(*cmp)(t_request, t_request);
-
-}	t_queue;
+}	t_heap;
 
 /*
  * For the structures:
