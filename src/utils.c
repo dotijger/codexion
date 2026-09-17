@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 16:25:10 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/17 16:02:49 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,10 @@ void	error_exit(char *exit_msg)
 
 void	log_event(t_data *data_table, int id, char *event)
 {
-	safe_mutex_handle(&data_table->log_mtx, LOCK);
+	t_mtx	*mtx;
+
+	mtx = data_table->log_mtx;
+	safe_mutex_handle(mtx, LOCK);
 	printf("%lu %d %s\n", get_time(MILLISECOND) - data_table->start_time, id, event);
 	safe_mutex_handle(mtx, UNLOCK);
 }
@@ -94,10 +97,10 @@ void	precise_usleep(long usec, t_data *data_table)
 
 int	left(int i, int n)
 {
-	return (i + 1 + n % n);
+	return (i);
 }
 
 int	right(int i, int n)
 {
-	return (i - 1 + n % n);
+	return ((i - 1 + n) % n);
 }

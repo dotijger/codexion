@@ -6,22 +6,13 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/16 13:15:25 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/17 16:25:52 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void init_heap(t_heap **heap, int (*cmp)(t_request, t_request))
-{
-	*heap = safe_malloc(sizeof(t_heap)); 
-	(*heap)->capacity = HEAP_CAPACITY;
-	(*heap)->size = 0;
-	(*heap)->queue = safe_malloc(sizeof(t_request) * heap->capacity);
-	(*heap)->cmp = cmp;
-}
-
-void	swap(t_request *a, t_request *b)
+static void	swap(t_request *a, t_request *b)
 {
 	t_request	*tmp;
 
@@ -30,7 +21,7 @@ void	swap(t_request *a, t_request *b)
 	*b = tmp;
 }
 
-void	heapify(t_heap *heap, int i)
+static void	heapify(t_heap *heap, int i)
 {
 	int	parent;
 	int	left_child;
@@ -53,6 +44,28 @@ void	heapify(t_heap *heap, int i)
 	}
 }
 
+void init_heap(t_heap **heap, int capacity, int (*cmp)(t_request, t_request))
+{
+	*heap = safe_malloc(sizeof(t_heap)); 
+	(*heap)->capacity = capacity;
+	(*heap)->size = 0;
+	(*heap)->queue = safe_malloc(sizeof(t_request) * heap->capacity);
+	(*heap)->cmp = cmp;
+}
+
+int	get_heap_index(t_heap *heap, int coder_id)
+{
+	int	i;
+	
+	i = -1;
+	while (++i < heap->size)
+	{
+		if (heap->queue[i].id == coder_id)
+			break ;
+	}
+	return (i);
+}
+
 void	insert(t_heap *heap, t_request request)
 {
 	if (heap->size == heap->capacity)
@@ -69,7 +82,7 @@ void	insert(t_heap *heap, t_request request)
 	}
 }
 
-t_request	*extract(t_heap *heap)
+t_request	*pop(t_heap *heap)
 {
 	t_request	*root;
 
@@ -85,3 +98,13 @@ t_request	*extract(t_heap *heap)
 	heapify(heap, 0);
 	return root;
 }
+
+void	remove_at_index(t_heap *heap, int index)
+{
+	if (index >= heap->size)
+		error_exit("Cannot remove node from heap at invalid index.");
+	heap->queue[index] = heap->queue[heap->size - 1];
+	heap->size--;
+	heapify(heap, index);
+}
+

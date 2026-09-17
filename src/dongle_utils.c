@@ -6,39 +6,42 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:52:10 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/14 12:57:36 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/17 16:25:13 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void	take_left_dongle(t_mtx *mtx, t_data *data_table, int i)
+bool	dongle_ready(t_dongle *a, long cooldown_ms)
 {
-	safe_mutex_handle(mtx, LOCK);
-	data_table->dongles[left(i)].taken = true;
-	safe_mutex_handle(mtx, UNLOCK);
-	log_event("%d has taken a dongle\n", i);
+	now = get_time(MILLISECOND);
+	if (a.taken)
+		return (false);
+	if (a.release_time_in_ms == 0)
+		return (true);
+	return (now >= (a.release_time_in_ms + cooldown_ms));
 }
 
-void	take_right_dongle(t_mtx *mtx, t_data *data_table, int i)
+bool	my_turn(t_heap *heap, t_coder *coder, t_coder *rival)
 {
-	safe_mutex_handle(mtx, LOCK);
-	data_table->dongles[right(i)].taken = true;
-	safe_mutex_handle(mtx, UNLOCK);
-	log_event("%d has taken a dongle\n", i);
+	int		coder_idx;
+	int		rival_idx;
+	bool	return;
+
+	coder_idx = get_heap_index(heap, coder->coder_id);
+	rival_idx = get_heap_index(heap, rival->coder_id);
+	if (rival_idx == -1 || coder_idx == 0)
+		return (true);
+	return (heap->cmp(heap->queue[coder_idx], heap->queue[rival_idx]);
 }
 
-void	put_left_dongle_back(t_mtx *mtx, t_data *data_table, int i)
+void	new_request(t_coder *coder, t_heap *heap)
 {
-	safe_mutex_handle(mtx, LOCK);
-	data_table->dongles[left(i)].taken = false;
-	safe_mutex_handle(mtx, UNLOCK);
-}
+	t_request	request;
 
-void	put_right_dongle_back(t_mtx *mtx, t_data *data_table, int i)
-{
-	safe_mutex_handle(mtx, LOCK);
-	data_table->dongles[right(i)].taken = false;
-	safe_mutex_handle(mtx, UNLOCK);
+	request.id = coder->coder_id;
+	request.arrival_time = get_time(MILLISECOND);
+	request.deadline_time = coder->burnout_deadline;
+	insert(heap, request);	
 }
 

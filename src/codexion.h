@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/16 13:43:23 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/17 16:21:42 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@
  * ANSI colors for fprintf
  * DEBUG_MODE (default = 0, if 1 will print more extensive logging)
 */
-
-#define HEAP_CAPACITY 512
 
 #define RED     "\033[31m"
 #define GREEN   "\033[32m"
@@ -102,9 +100,11 @@ typedef struct s_coder {
   int 		coder_id;
   int 		compiles;
   long		last_compile_start;
-  long 		time_to_burnout;
+  long 		burnout_deadline;
   t_dongle	*left;
   t_dongle	*right;
+  t_coder	*left_rival;
+  t_coder	*right_rival;
   pthread_t thread;
   t_data 	*data_table;
 
@@ -130,6 +130,7 @@ typedef struct s_data {
   t_mtx		dongle_mtx;
   t_coder 	*coders;
   t_dongle 	*dongles;
+  t_heap	*heap;
 
 }		t_data;
 
@@ -147,7 +148,7 @@ typedef struct s_data {
 
 // utils.c
 void	error_exit(char *exit_msg);
-void	log_event(t_mtx, *mtx, char *event)
+void	log_event(t_data *data_table, int id, char *event);
 long	get_time(e_time_format time_code);
 void	precise_usleep(long usec, t_data *data_table);
 int		left(int i, int n);
@@ -157,24 +158,28 @@ int		right(int i, int n);
 void	debug(int i, t_data *data_table, long time_to_debug);
 void	refactor(int i, t_data *data_table, long time_to_refactor);
 void	compile(int i, t_data *data_table, long time_to_compile);
-void	acquire_dongles(int i, t_data *data_table);
-void	put_dongles_back(int i, t_data *data_table);
-void	test(int i, t_data *data_table);
+void	acquire_dongles(t_coder *coder);
+void	release_dongles(t_coder *coder);
+
+// dongle_utils.c
+bool	dongle_ready(t_dongle *a, long cooldown_ms);
+bool	my_turn(t_heap *heap, t_coder *coder, t_coder *rival);
+void	new_request(t_coder *coder, t_heap *heap);
 
 // routine.c
 void	coding_routine(void *arg);
 void	monitor_routine(void *arg);
 
-
-// queue.c
-
+// heap.c
+void 		init_heap(t_heap **heap, int capacity, int (*cmp)(t_request, t_request));
+int			get_heap_index(t_heap *heap, int coder_id);
+void		insert(t_heap *heap, t_request request);
+t_request	*pop(t_heap *heap);
+void		remove_at_index(t_heap *heap, int index);
 
 // scheduler.c
 int	fifo_cmp(t_request a, t_request b);
 int	edf_cmp(t_request a, t_request b);
-
-// dongle_utils.c
-
 
 // safe_utils.c
 void	*safe_malloc(size_t size);
