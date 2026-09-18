@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/10 17:54:14 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/18 11:24:28 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +55,10 @@ static const char	*valid_input(char *str)
 {
 	int	i;
 	const char	*start;
-	bool	sign;
+	int	sign;
 
 	i = 0;
-	sign = false;
+	sign = 0;
 	start = NULL;
 	while (*str)
 	{
@@ -69,9 +69,11 @@ static const char	*valid_input(char *str)
 		else if (*str == '.')
 			error_exit("Only integers are allowed, no floats.");
 		else if (*str >= '0' && *str <= '9')
+		{
 			if (!start)
 				start = str;
 			i++;
+		}
 		str++;
 	}
 	if (i > 10 || (i == 10 && ft_strncmp(start, "2147483647", 10) > 0))
@@ -111,7 +113,7 @@ void	parse_input(t_data *data_table, char **av)
 	data_table->time_to_compile = ft_atol(av[3]);
 	data_table->time_to_debug = ft_atol(av[4]);
 	data_table->time_to_refactor = ft_atol(av[5]);
-	data_table->number_of_compiles_required = ft_atol(av[6]);
+	data_table->compiles_required = ft_atol(av[6]);
 	data_table->dongle_cooldown = ft_atol(av[7]);
 	data_table->scheduler = av[8];
 }

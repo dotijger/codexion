@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/17 16:25:52 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/18 11:26:46 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static void	swap(t_request *a, t_request *b)
 {
-	t_request	*tmp;
+	t_request	tmp;
 
 	tmp = *a;
 	*a = *b;
@@ -39,17 +39,17 @@ static void	heapify(t_heap *heap, int i)
 		parent = right_child;
 	if (parent != i)
 	{
-		swap(&heap->queue[i], &heap->array[parent]);
+		swap(&heap->queue[i], &heap->queue[parent]);
 		heapify(heap, parent);
 	}
 }
 
-void init_heap(t_heap **heap, int capacity, int (*cmp)(t_request, t_request))
+void init_heap(t_heap **heap, int capacity, bool (*cmp)(t_request, t_request))
 {
 	*heap = safe_malloc(sizeof(t_heap)); 
 	(*heap)->capacity = capacity;
 	(*heap)->size = 0;
-	(*heap)->queue = safe_malloc(sizeof(t_request) * heap->capacity);
+	(*heap)->queue = safe_malloc(sizeof(t_request) * (*heap)->capacity);
 	(*heap)->cmp = cmp;
 }
 
@@ -60,7 +60,7 @@ int	get_heap_index(t_heap *heap, int coder_id)
 	i = -1;
 	while (++i < heap->size)
 	{
-		if (heap->queue[i].id == coder_id)
+		if (heap->queue[i].coder_id == coder_id)
 			break ;
 	}
 	return (i);

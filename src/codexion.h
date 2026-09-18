@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/17 16:21:42 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/18 11:26:17 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@
 typedef pthread_mutex_t t_mtx;
 typedef pthread_cond_t t_cond;
 
+typedef struct s_data	t_data; // IOU for the compiler (aka = we define this later)
+typedef struct s_coder	t_coder;
+
 typedef enum	e_scheduler
 {
 	FIFO,
@@ -57,6 +60,20 @@ typedef enum	e_time_format
 	MICROSECOND,
 
 }		t_time_format;
+
+typedef enum e_pthread_code
+{
+	INIT,
+	LOCK,
+	UNLOCK,
+	DESTROY,
+	CREATE,
+	JOIN,
+	DETACH,
+	WAIT,
+	SIGNAL,
+	BROADCAST,
+}		t_pthread_code;
 
 typedef struct	s_request
 {
@@ -85,7 +102,6 @@ typedef struct	s_heap
  * 		t_coder
 */
 
-typedef struct s_data t_data; // IOU for the compiler (aka = we define this later)
 
 typedef struct s_dongle {
 
@@ -149,7 +165,7 @@ typedef struct s_data {
 // utils.c
 void	error_exit(char *exit_msg);
 void	log_event(t_data *data_table, int id, char *event);
-long	get_time(e_time_format time_code);
+long	get_time(t_time_format time_code);
 void	precise_usleep(long usec, t_data *data_table);
 int		left(int i, int n);
 int		right(int i, int n);
@@ -171,21 +187,21 @@ void	coding_routine(void *arg);
 void	monitor_routine(void *arg);
 
 // heap.c
-void 		init_heap(t_heap **heap, int capacity, int (*cmp)(t_request, t_request));
+void 		init_heap(t_heap **heap, int capacity, bool (*cmp)(t_request, t_request));
 int			get_heap_index(t_heap *heap, int coder_id);
 void		insert(t_heap *heap, t_request request);
 t_request	*pop(t_heap *heap);
 void		remove_at_index(t_heap *heap, int index);
 
 // scheduler.c
-int	fifo_cmp(t_request a, t_request b);
-int	edf_cmp(t_request a, t_request b);
+bool	fifo_cmp(t_request a, t_request b);
+bool	edf_cmp(t_request a, t_request b);
 
 // safe_utils.c
 void	*safe_malloc(size_t size);
 void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code);
 void	safe_thread_handle(pthread_t *thread, void *(*start_routine)(void *), void *data, t_pthread_code code);
-void	safe_cond_handle(t_cond *cond, t_mtx *mtx, timespec time, t_pthread_code code);
+void	safe_cond_handle(t_cond *cond, t_mtx *mtx, struct timespec time, t_pthread_code code);
 
 // parser.c
 void	parse_input(t_data *data_table, char **av);

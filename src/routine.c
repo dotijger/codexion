@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/17 15:02:28 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/18 11:28:08 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@ static bool	burned_out(t_coder *coders)
 	while (coders++)
 	{
 		now = get_time(MILLISECOND);
-		if (coder->burnout_deadline < now)
+		if (coders->burnout_deadline < now)
 		{
-			log_event(&coder->data_table, coder->coder_id, "burned out\n");
+			log_event(coders->data_table, coders->coder_id, "burned out\n");
 			burnout = true;
 		}
 	}
@@ -56,7 +56,7 @@ void	coding_routine(void *arg)
 	t_data	*data_table;
 	t_coder	coder;
 
-	coder = (t_coder)&arg;
+	coder = &(t_coder *)arg;
 	data_table = coder.data_table;
 	while (!data_table->running)
 		;

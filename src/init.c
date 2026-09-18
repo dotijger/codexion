@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/17 16:14:23 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/18 11:25:59 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,19 @@ static void	assign_dongles_and_rivals(t_data *data_table, int i)
 	int	n;
 
 	n = (int)data_table->number_of_coders;
-	data_table->coders[i].left_rival = data_table->coders[left(i, n)];
-	data_table->coders[i].right_rival = data_table->coders[right(i, n)];
+	data_table->coders[i].left_rival = &data_table->coders[left(i, n)];
+	data_table->coders[i].right_rival = &data_table->coders[right(i, n)];
 	data_table->coders[i].left = &data_table->dongles[left(i, n)];
 	data_table->coders[i].right = &data_table->dongles[right(i, n)];
 }
 
 static void	init_coder(t_data *data_table, int i)
 {
-	data_table->coders[i].id = i;
+	data_table->coders[i].coder_id = i;
 	data_table->coders[i].compiles = 0;
 	data_table->coders[i].data_table = data_table;
 	data_table->coders[i].last_compile_start = 0;
-	data_table->coders[i].time_to_burnout = get_time(MILLISECOND) + data_table->time_to_burnout;
+	data_table->coders[i].burnout_deadline = get_time(MILLISECOND) + data_table->time_to_burnout;
 	assign_dongles_and_rivals(data_table, i);
 }
 
