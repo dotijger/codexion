@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/17 16:17:44 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/20 00:40:54 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,54 +14,91 @@
 
 void	debug(int i, t_data *data_table, long time_to_debug)
 {
-	log_event(data_table, i, "is debugging\n");
-	precise_usleep(time_to_debug, data_table);
+	log_event(data_table, i + 1, "is debugging\n");
+	precise_usleep(time_to_debug * 1000, data_table);
 }
 
 void	refactor(int i, t_data *data_table, long time_to_refactor)
 {
-	log_event(data_table, i, "is refactoring\n");
-	precise_usleep(time_to_refactor, data_table);
+	log_event(data_table, i + 1, "is refactoring\n");
+	precise_usleep(time_to_refactor * 1000, data_table);
 }
 
 void	compile(int i, t_data *data_table, long time_to_compile)
 {
-	log_event(data_table, i, "is compiling\n");
+	log_event(data_table, i + 1, "is compiling\n");
 	safe_mutex_handle(&data_table->table_mtx, LOCK);
 	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
 	data_table->coders[i].burnout_deadline = get_time(MILLISECOND) + data_table->time_to_burnout;
 	data_table->coders[i].compiles++;
-	safe_cond_handle(&data_table->monitor_cond, NULL, NULL, SIGNAL);
 	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
-	precise_usleep(time_to_compile, data_table);
+	safe_cond_handle(&data_table->monitor_cond, NULL, ms_to_ts(0), SIGNAL);
+	precise_usleep(time_to_compile * 1000, data_table);
+}
+
+static void	acquire_dongle(t_coder *coder, t_dongle *dongle)
+{
+	struct timespec	time_ready;
+
+	safe_mutex_handle(&dongle->mtx, LOCK);
+	new_request(coder, dongle->heap);
+	while (is_running(coder->data_table)
+			&& !(my_turn(dongle->heap, coder, dongle)
+			&& dongle_ready(dongle, coder->data_table->dongle_cooldown)))
+	{
+		if (my_turn(dongle->heap, coder, dongle))
+		{
+			time_ready = ms_to_ts(available_at(dongle, coder->data_table->dongle_cooldown));
+			safe_cond_handle(&dongle->cond, &dongle->mtx, time_ready, TIMEDWAIT);
+		}
+		else
+			safe_cond_handle(&dongle->cond, &dongle->mtx, ms_to_ts(0), WAIT);
+	}
+	if (!is_running(coder->data_table))
+	{
+		safe_mutex_handle(&dongle->mtx, UNLOCK);
+		return ;
+	}
+	remove_at_index(dongle->heap, 0);
+	dongle->taken = true;
+	safe_mutex_handle(&dongle->mtx, UNLOCK);
+	log_event(coder->data_table, coder->coder_id + 1, "has taken a dongle\n");
+	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
 }
 
 void	acquire_dongles(t_coder *coder)
 {
-	new_request(coder, coder->data_table->heap);
-	safe_mutex_handle(&coder->data_table->dongle_mtx, LOCK);
-	while (coder->data_table->running &&
-			!(dongle_ready(coder->left->taken) && dongle_ready(coder->right)
-				&& my_turn(coder->data_table->heap, coder, coder->left_rival)
-				&& my_turn(coder->data_table->heap, coder, coder->right_rival))
-			)
-		safe_cond_handle(&coder->data_table->dongle_cond, &coder->data_table->dongle_mtx, NULL, WAIT);
-	coder->left->taken = true;
-	log_event(coder->data_table, coder->coder_id, "has taken a dongle\n");
-	coder->right->taken = true;
-	log_event(coder->data_table, coder->coder_id, "has taken a dongle\n");
-	remove_at_index(&coder->data_table->heap, get_heap_index(&coder->data_table->heap, coder->coder_id));
-	safe_mutex_handle(&coder->data_table->dongle_mtx, UNLOCK);
+	t_dongle	*first;
+	t_dongle	*second;
+
+	if (coder->coder_id % 2 == 0)
+	{
+		first = coder->right;
+		second = coder->left;
+	}
+	else
+	{
+		first = coder->left;
+		second = coder->right;
+	}
+	acquire_dongle(coder, first);
+	if (first != second && is_running(coder->data_table))
+		acquire_dongle(coder, second);
+
+}
+
+static void	release_dongle(t_dongle *dongle)
+{
+	safe_mutex_handle(&dongle->mtx, LOCK);
+	dongle->taken = false;
+	dongle->release_time_in_ms = get_time(MILLISECOND);
+	safe_mutex_handle(&dongle->mtx, UNLOCK);
+	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
 }
 
 void	release_dongles(t_coder *coder)
 {
-	safe_mutex_handle(&coder->data_table->dongle_mtx, LOCK);
-	coder->left->taken = false;
-	coder->left->release_time_in_ms = get_time(MILLISECOND);
-	coder->right->taken = false;
-	coder->right->release_time_in_ms = get_time(MILLISECOND);
-	safe_mutex_handle(&coder->data_table->dongle_mtx, UNLOCK);
-	safe_cond_handle(&coder->data_table->dongle_cond, BROADCAST);
+	release_dongle(coder->left);
+	release_dongle(coder->right);
 }
 

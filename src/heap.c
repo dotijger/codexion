@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/18 11:26:46 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/19 15:20:06 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,10 @@ static void	heapify(t_heap *heap, int i)
 	}
 }
 
-void init_heap(t_heap **heap, int capacity, bool (*cmp)(t_request, t_request))
+void init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
 {
 	*heap = safe_malloc(sizeof(t_heap)); 
-	(*heap)->capacity = capacity;
+	(*heap)->capacity = 2;
 	(*heap)->size = 0;
 	(*heap)->queue = safe_malloc(sizeof(t_request) * (*heap)->capacity);
 	(*heap)->cmp = cmp;
@@ -88,7 +88,7 @@ t_request	*pop(t_heap *heap)
 
 	if (heap->size <= 0)
 		error_exit("Cannot extract from empty heap.");
-	root = heap->queue[0];
+	root = &heap->queue[0];
 	if (heap->size == 1)
 	{
 		heap->size--;
@@ -108,3 +108,11 @@ void	remove_at_index(t_heap *heap, int index)
 	heapify(heap, index);
 }
 
+void	print_queue(t_heap *heap)
+{
+	int i;
+
+	i = -1;
+	while (++i < heap->size)
+		printf("position %d : coder %d\n", i, heap->queue[i].coder_id);
+}

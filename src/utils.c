@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/17 16:02:49 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/19 16:12:22 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,15 @@ void	error_exit(char *exit_msg)
 void	log_event(t_data *data_table, int id, char *event)
 {
 	t_mtx	*mtx;
+	long	now;
 
-	mtx = data_table->log_mtx;
+	if (!is_running(data_table))
+		return ;
+	now = get_time(MILLISECOND);
+	mtx = &data_table->log_mtx;
 	safe_mutex_handle(mtx, LOCK);
-	printf("%lu %d %s\n", get_time(MILLISECOND) - data_table->start_time, id, event);
+	printf("%ld %d %s", now - data_table->start_time, id, event);
+	fflush(stdout);
 	safe_mutex_handle(mtx, UNLOCK);
 }
 
@@ -45,14 +50,12 @@ void	log_event(t_data *data_table, int id, char *event)
  * 			- TLDR: tv_sec fives time, usec gives fractional remainder of current s
 */
 
-long get_time(e_time_format time_format)
+long get_time(t_time_format time_format)
 {
 	struct timeval	tv;
 
   if (gettimeofday(&tv, NULL))
     return (0);
-  if (time_format == SECOND)
-	  return ((uint64_t)tv.tv_sec) + ((uint64_t)tv.tv_usec / 1000000);
   else if (time_format == MILLISECOND)
 	  return ((long)tv.tv_sec * 1000) + ((long)tv.tv_usec / 1000);
   else if (time_format == MICROSECOND)
@@ -69,24 +72,26 @@ long get_time(e_time_format time_format)
 void	precise_usleep(long usec, t_data *data_table)
 {
 	long	start;
+	long	elapsed;
+	long	rem;
 	
 	start = get_time(MICROSECOND);
 	if (start == 0)
 		error_exit("precise_usleep failed.\n");
 	while (get_time(MICROSECOND) - start < usec)
 	{
-		if (data_table->finished_codexion)
+		if (!is_running(data_table))
 			break ;
 		elapsed = get_time(MICROSECOND) - start;
 		rem = usec - elapsed;
 		if (rem > 1000) // if remaining time is bigger than 1 millisecond
 		{
-			usleep(rem / 2); // safety margin against sleep
+			usleep(rem / 4); // safety margin against sleep
 		}
 		else // spinlock until time is up
 		{
 			while(get_time(MICROSECOND) - start < usec)
-				;
+				usleep(50);
 		}
 	}
 }
@@ -95,7 +100,7 @@ void	precise_usleep(long usec, t_data *data_table)
  * Functions to get the left and right positions of the coder
 */ 
 
-int	left(int i, int n)
+int	left(int i)
 {
 	return (i);
 }

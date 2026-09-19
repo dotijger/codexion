@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/18 11:26:17 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/19 16:00:20 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ typedef enum e_pthread_code
 	JOIN,
 	DETACH,
 	WAIT,
+	TIMEDWAIT,
 	SIGNAL,
 	BROADCAST,
 }		t_pthread_code;
@@ -88,7 +89,7 @@ typedef struct	s_heap
 	t_request	*queue;
 	int			size;
 	int			capacity;
-	int			(*cmp)(t_request, t_request);
+	bool		(*cmp)(t_request, t_request);
 
 }	t_heap;
 
@@ -108,6 +109,9 @@ typedef struct s_dongle {
   int		dongle_id;
   bool		taken;
   long		release_time_in_ms;
+  t_heap	*heap;
+  t_mtx		mtx;
+  t_cond	cond;
 
 } t_dongle;
 
@@ -144,6 +148,7 @@ typedef struct s_data {
   t_mtx 	log_mtx;
   t_mtx		table_mtx;
   t_mtx		dongle_mtx;
+  t_mtx		sim_mtx;
   t_coder 	*coders;
   t_dongle 	*dongles;
   t_heap	*heap;
@@ -167,7 +172,7 @@ void	error_exit(char *exit_msg);
 void	log_event(t_data *data_table, int id, char *event);
 long	get_time(t_time_format time_code);
 void	precise_usleep(long usec, t_data *data_table);
-int		left(int i, int n);
+int		left(int i);
 int		right(int i, int n);
 
 // coder_routine_utils.c
@@ -179,19 +184,24 @@ void	release_dongles(t_coder *coder);
 
 // dongle_utils.c
 bool	dongle_ready(t_dongle *a, long cooldown_ms);
-bool	my_turn(t_heap *heap, t_coder *coder, t_coder *rival);
+t_coder	*get_rival(t_coder *coder, t_dongle *a);
+bool	my_turn(t_heap *heap, t_coder *coder, t_dongle *a);
 void	new_request(t_coder *coder, t_heap *heap);
+long	available_at(t_dongle *a, long cooldown_ms);
 
 // routine.c
-void	coding_routine(void *arg);
-void	monitor_routine(void *arg);
+void	*coding_routine(void *arg);
+struct timespec	ms_to_ts(long ms);
+struct timespec	give_earliest_deadline(t_coder *coders);
+void	*monitor_routine(void *arg);
 
 // heap.c
-void 		init_heap(t_heap **heap, int capacity, bool (*cmp)(t_request, t_request));
+void 		init_heap(t_heap **heap, bool (*cmp)(t_request, t_request));
 int			get_heap_index(t_heap *heap, int coder_id);
 void		insert(t_heap *heap, t_request request);
 t_request	*pop(t_heap *heap);
 void		remove_at_index(t_heap *heap, int index);
+void	print_queue(t_heap *heap);
 
 // scheduler.c
 bool	fifo_cmp(t_request a, t_request b);
@@ -202,6 +212,8 @@ void	*safe_malloc(size_t size);
 void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code);
 void	safe_thread_handle(pthread_t *thread, void *(*start_routine)(void *), void *data, t_pthread_code code);
 void	safe_cond_handle(t_cond *cond, t_mtx *mtx, struct timespec time, t_pthread_code code);
+bool	is_running(t_data *data_table);
+void	stop_sim(t_data *data_table);
 
 // parser.c
 void	parse_input(t_data *data_table, char **av);
@@ -211,3 +223,6 @@ void	codexion_init(t_data *data_table);
 
 // run.c
 void	codexion(t_data *data_table);
+
+// clean.c
+void	clean_up(t_data *data_table);
