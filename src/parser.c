@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/18 11:24:28 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/20 10:39:36 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ static long	ft_atol(char *str)
 	num = 0;
 	while (*start >= '0' && *start <= '9')
 	{
-		num += num * 10 + *start - '0';
+		num = num * 10 + *start - '0';
 		start++;
 	}
 	if (num <= INT_MAX)
@@ -105,9 +105,9 @@ static long	ft_atol(char *str)
 
 void	parse_input(t_data *data_table, char **av)
 {
-	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "efi") != 0)
+	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "edf") != 0)
 		error_exit("Invalid argument for 'scheduler':"
-				"please choose between 'fifo' and 'efi'.");
+				"please choose between 'fifo' and 'edf'.");
 	data_table->number_of_coders = ft_atol(av[1]);
 	data_table->time_to_burnout = ft_atol(av[2]);
 	data_table->time_to_compile = ft_atol(av[3]);

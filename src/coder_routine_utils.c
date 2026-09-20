@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 00:40:54 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/20 10:37:57 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,12 @@ void	compile(int i, t_data *data_table, long time_to_compile)
 	safe_mutex_handle(&data_table->table_mtx, LOCK);
 	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
 	data_table->coders[i].burnout_deadline = get_time(MILLISECOND) + data_table->time_to_burnout;
-	data_table->coders[i].compiles++;
 	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
 	safe_cond_handle(&data_table->monitor_cond, NULL, ms_to_ts(0), SIGNAL);
 	precise_usleep(time_to_compile * 1000, data_table);
+	safe_mutex_handle(&data_table->table_mtx, LOCK);
+	data_table->coders[i].compiles++;
+	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
 }
 
 static void	acquire_dongle(t_coder *coder, t_dongle *dongle)

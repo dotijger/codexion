@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:52:10 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/19 15:35:16 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/20 10:42:07 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,9 @@ void	new_request(t_coder *coder, t_heap *heap)
 
 	request.coder_id = coder->coder_id;
 	request.arrival_time = get_time(MILLISECOND);
+	safe_mutex_handle(&coder->data_table->table_mtx, LOCK);
 	request.deadline_time = coder->burnout_deadline;
+	safe_mutex_handle(&coder->data_table->table_mtx, UNLOCK);
 	insert(heap, request);	
 }
 

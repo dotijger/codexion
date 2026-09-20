@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 00:40:31 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/20 10:48:05 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,23 +56,23 @@ static void	start_codexion(t_data *data_table)
 void	*coding_routine(void *arg)
 {
 	t_data	*data_table;
-	t_coder	coder;
+	t_coder	*coder;
 
-	coder = *(t_coder *)arg;
-	data_table = coder.data_table;
+	coder = (t_coder *)arg;
+	data_table = coder->data_table;
 	while (!is_running(data_table))
 		;
 
-	while (coder.compiles < data_table->compiles_required
+	while (coder->compiles < data_table->compiles_required
 			&& is_running(data_table))
 	{
-		acquire_dongles(&coder);
-		compile(coder.coder_id, data_table, coder.data_table->time_to_compile);
-		release_dongles(&coder);
-		if (coder.compiles == data_table->compiles_required)
+		acquire_dongles(coder);
+		compile(coder->coder_id, data_table, coder->data_table->time_to_compile);
+		release_dongles(coder);
+		if (coder->compiles == data_table->compiles_required)
 			return (NULL);
-		debug(coder.coder_id, data_table, coder.data_table->time_to_debug);
-		refactor(coder.coder_id, data_table, coder.data_table->time_to_refactor);
+		debug(coder->coder_id, data_table, coder->data_table->time_to_debug);
+		refactor(coder->coder_id, data_table, coder->data_table->time_to_refactor);
 	}
 	return (NULL);
 
@@ -131,10 +131,10 @@ void	*monitor_routine(void *arg)
 		//cret_code = pthread_cond_timedwait(&data_table->monitor_cond,
 											// &data_table->table_mtx, &deadline);
 		safe_mutex_handle(&data_table->table_mtx, LOCK);
-		if (burned_out(data_table->coders))
-				stop_sim(data_table);
 		if (done(data_table->coders))
 			stop_sim(data_table);
+		if (burned_out(data_table->coders))
+				stop_sim(data_table);
 		safe_mutex_handle(&data_table->table_mtx, UNLOCK);
 		if (is_running(data_table))
 			precise_usleep(200, data_table);

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 00:40:11 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/20 02:15:43 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,14 @@
 static void	assign_dongles_and_rivals(t_data *data_table, int i)
 {
 	int	n;
+	int	left_idx;
+	int	right_idx;
 
 	n = (int)data_table->number_of_coders;
-	data_table->coders[i].left_rival = &data_table->coders[left(i)];
-	data_table->coders[i].right_rival = &data_table->coders[right(i, n)];
+	left_idx = (i + 1 + n) % n;
+	right_idx = (i - 1 + n) % n;
+	data_table->coders[i].left_rival = &data_table->coders[left_idx];
+	data_table->coders[i].right_rival = &data_table->coders[right_idx];
 	data_table->coders[i].left = &data_table->dongles[left(i)];
 	data_table->coders[i].right = &data_table->dongles[right(i, n)];
 }
