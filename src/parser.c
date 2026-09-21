@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 10:39:36 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 12:29:40 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ static long	ft_atol(char *str)
 	while (is_space(*str))
 		str++;
 	start = valid_input(str);
+	if (!start)
+		error_exit("Argument must contain digits.");
 	num = 0;
 	while (*start >= '0' && *start <= '9')
 	{
@@ -115,5 +117,8 @@ void	parse_input(t_data *data_table, char **av)
 	data_table->time_to_refactor = ft_atol(av[5]);
 	data_table->compiles_required = ft_atol(av[6]);
 	data_table->dongle_cooldown = ft_atol(av[7]);
-	data_table->scheduler = av[8];
+	if (strcmp(av[8], "fifo"))
+		data_table->scheduler = FIFO;
+	else
+		data_table->scheduler = EDF;
 }

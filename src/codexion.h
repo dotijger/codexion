@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/19 16:00:20 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 11:49:17 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,26 +132,26 @@ typedef struct s_coder {
 
 typedef struct s_data {
 
-  long		number_of_coders;
-  long 		time_to_burnout;
-  long 		time_to_compile;
-  long 		time_to_debug;
-  long 		time_to_refactor;
-  long 		compiles_required;
-  long 		dongle_cooldown;
-  char 		*scheduler;
-  long		start_time;
-  pthread_t	monitor;
-  bool 		running;
-  t_cond	dongle_cond;
-  t_cond	monitor_cond;
-  t_mtx 	log_mtx;
-  t_mtx		table_mtx;
-  t_mtx		dongle_mtx;
-  t_mtx		sim_mtx;
-  t_coder 	*coders;
-  t_dongle 	*dongles;
-  t_heap	*heap;
+  long			number_of_coders;
+  long 			time_to_burnout;
+  long 			time_to_compile;
+  long 			time_to_debug;
+  long 			time_to_refactor;
+  long 			compiles_required;
+  long 			dongle_cooldown;
+  t_scheduler	scheduler;
+  long			start_time;
+  pthread_t		monitor;
+  bool 			running;
+  t_cond		dongle_cond;
+  t_cond		monitor_cond;
+  t_mtx 		log_mtx;
+  t_mtx			table_mtx;
+  t_mtx			dongle_mtx;
+  t_mtx			sim_mtx;
+  t_coder 		*coders;
+  t_dongle 		*dongles;
+  t_heap		*heap;
 
 }		t_data;
 

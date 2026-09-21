@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 10:48:05 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 12:19:45 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static bool	burned_out(t_coder *coders)
 	while (++i < coders->data_table->number_of_coders)
 	{
 		now = get_time(MILLISECOND);
-		if (coders[i].burnout_deadline < now && !(coders[i].compiles < coders->data_table->compiles_required))
+		if (!(coders[i].compiles >= coders->data_table->compiles_required) && now > coders[i].burnout_deadline)
 		{
 			log_event(coders[i].data_table, coders[i].coder_id + 1, "burned out\n");
 			return (true);
@@ -44,15 +44,6 @@ static bool	done(t_coder *coders)
 	return (true);
 }
 
-static void	start_codexion(t_data *data_table)
-{
-	safe_mutex_handle(&data_table->table_mtx, LOCK);
-	data_table->running = true;
-	data_table->start_time = get_time(MILLISECOND);
-	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
-}
-
-
 void	*coding_routine(void *arg)
 {
 	t_data	*data_table;
@@ -61,7 +52,7 @@ void	*coding_routine(void *arg)
 	coder = (t_coder *)arg;
 	data_table = coder->data_table;
 	while (!is_running(data_table))
-		;
+		usleep(100);
 
 	while (coder->compiles < data_table->compiles_required
 			&& is_running(data_table))
@@ -124,7 +115,9 @@ void	*monitor_routine(void *arg)
 	//struct timespec	deadline;
 
 	data_table = (t_data *)arg;
-	start_codexion(data_table);
+	while (!is_running(data_table))
+		usleep(100);
+
 	while (is_running(data_table))
 	{
 		// deadline = give_earliest_deadline(data_table->coders);
@@ -133,8 +126,8 @@ void	*monitor_routine(void *arg)
 		safe_mutex_handle(&data_table->table_mtx, LOCK);
 		if (done(data_table->coders))
 			stop_sim(data_table);
-		if (burned_out(data_table->coders))
-				stop_sim(data_table);
+		else if (burned_out(data_table->coders))
+			stop_sim(data_table);
 		safe_mutex_handle(&data_table->table_mtx, UNLOCK);
 		if (is_running(data_table))
 			precise_usleep(200, data_table);

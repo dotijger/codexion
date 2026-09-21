@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 10:37:57 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 12:28:04 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,15 @@ static void	acquire_dongle(t_coder *coder, t_dongle *dongle)
 	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
 }
 
+static void	release_dongle(t_dongle *dongle)
+{
+	safe_mutex_handle(&dongle->mtx, LOCK);
+	dongle->taken = false;
+	dongle->release_time_in_ms = get_time(MILLISECOND);
+	safe_mutex_handle(&dongle->mtx, UNLOCK);
+	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
+}
+
 void	acquire_dongles(t_coder *coder)
 {
 	t_dongle	*first;
@@ -86,18 +95,14 @@ void	acquire_dongles(t_coder *coder)
 	acquire_dongle(coder, first);
 	if (first != second && is_running(coder->data_table))
 		acquire_dongle(coder, second);
-
+	else if (first == second)
+	{
+		while (is_running(coder->data_table))
+			usleep(1000);
+		release_dongle(first);
+		return ;
+	}
 }
-
-static void	release_dongle(t_dongle *dongle)
-{
-	safe_mutex_handle(&dongle->mtx, LOCK);
-	dongle->taken = false;
-	dongle->release_time_in_ms = get_time(MILLISECOND);
-	safe_mutex_handle(&dongle->mtx, UNLOCK);
-	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
-}
-
 void	release_dongles(t_coder *coder)
 {
 	release_dongle(coder->left);

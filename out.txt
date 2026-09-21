@@ -1,0 +1,115 @@
+0 1 has taken a dongle
+0 1 has taken a dongle
+0 4 has taken a dongle
+0 4 has taken a dongle
+0 4 is compiling
+0 2 has taken a dongle
+0 1 is compiling
+200 4 is debugging
+200 1 is debugging
+250 5 has taken a dongle
+250 5 has taken a dongle
+250 5 is compiling
+250 2 has taken a dongle
+250 2 is compiling
+300 4 is refactoring
+301 1 is refactoring
+450 5 is debugging
+450 2 is debugging
+500 3 has taken a dongle
+500 3 has taken a dongle
+500 4 has taken a dongle
+500 3 is compiling
+500 1 has taken a dongle
+500 1 has taken a dongle
+500 1 is compiling
+550 5 is refactoring
+550 2 is refactoring
+700 1 is debugging
+700 3 is debugging
+750 4 has taken a dongle
+750 4 is compiling
+750 2 has taken a dongle
+750 2 has taken a dongle
+750 2 is compiling
+800 1 is refactoring
+800 3 is refactoring
+900 1 has taken a dongle
+950 4 is debugging
+950 2 is debugging
+1000 3 has taken a dongle
+1000 3 has taken a dongle
+1000 3 is compiling
+1000 1 has taken a dongle
+1000 5 has taken a dongle
+1000 1 is compiling
+1050 4 is refactoring
+1050 2 is refactoring
+1200 3 is debugging
+1200 1 is debugging
+1250 5 has taken a dongle
+1250 5 is compiling
+1250 2 has taken a dongle
+1250 2 has taken a dongle
+1250 2 is compiling
+1300 3 is refactoring
+1300 1 is refactoring
+1450 5 is debugging
+1450 2 is debugging
+1500 4 has taken a dongle
+1500 4 has taken a dongle
+1500 4 is compiling
+1500 1 has taken a dongle
+1500 1 has taken a dongle
+1500 3 has taken a dongle
+1500 1 is compiling
+1550 5 is refactoring
+1550 2 is refactoring
+1700 4 is debugging
+1700 1 is debugging
+1750 5 has taken a dongle
+1750 5 has taken a dongle
+1750 5 is compiling
+1750 3 has taken a dongle
+1750 3 is compiling
+1800 4 is refactoring
+1800 1 is refactoring
+1950 5 is debugging
+1950 3 is debugging
+2000 2 has taken a dongle
+2000 2 has taken a dongle
+2000 2 is compiling
+2000 1 has taken a dongle
+2000 4 has taken a dongle
+2000 4 has taken a dongle
+2000 4 is compiling
+2050 3 is refactoring
+2050 5 is refactoring
+2200 2 is debugging
+2200 4 is debugging
+2250 3 has taken a dongle
+2250 3 has taken a dongle
+2250 3 is compiling
+2250 5 has taken a dongle
+2250 1 has taken a dongle
+2250 1 is compiling
+2300 2 is refactoring
+2300 4 is refactoring
+2450 3 is debugging
+2500 2 has taken a dongle
+2500 2 has taken a dongle
+2500 2 is compiling
+2500 5 has taken a dongle
+2500 5 is compiling
+2550 3 is refactoring
+2700 5 is debugging
+2750 4 has taken a dongle
+2750 4 has taken a dongle
+2750 3 has taken a dongle
+2750 4 is compiling
+2800 5 is refactoring
+3000 5 has taken a dongle
+3000 5 has taken a dongle
+3000 5 is compiling
+3000 3 has taken a dongle
+3000 3 is compiling

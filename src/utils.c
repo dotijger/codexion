@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/20 10:30:16 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 12:25:06 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,10 @@ void	log_event(t_data *data_table, int id, char *event)
 
 	if (!is_running(data_table))
 		return ;
-	now = get_time(MILLISECOND);
 	mtx = &data_table->log_mtx;
 	safe_mutex_handle(mtx, LOCK);
+	now = get_time(MILLISECOND);
 	printf("%ld %d %s", (now - data_table->start_time), id, event);
-	if (id < 0 || id > data_table->number_of_coders)
-		abort();
 	fflush(stdout);
 	safe_mutex_handle(mtx, UNLOCK);
 }
