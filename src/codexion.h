@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 11:49:17 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 18:14:57 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,28 +22,13 @@
 #include <stdint.h> // for booleans and uint64_t and INT_MAX
 #include <limits.h>
 
-/*
- * Global macros:
- * ANSI colors for fprintf
- * DEBUG_MODE (default = 0, if 1 will print more extensive logging)
-*/
-
 #define RED     "\033[31m"
-#define GREEN   "\033[32m"
-#define YELLOW  "\033[33m"
-#define BLUE    "\033[34m"
-#define MAGENTA "\033[35m"
-#define CYAN    "\033[36m"
 #define RESET   "\033[0m"
-
-/*
- * ENUM structures (for getting/setting and safe handling of threads/mutexes --> avoiding the overwriting errors by lock/unlock) as well as time
- */
 
 typedef pthread_mutex_t t_mtx;
 typedef pthread_cond_t t_cond;
 
-typedef struct s_data	t_data; // IOU for the compiler (aka = we define this later)
+typedef struct s_data	t_data;
 typedef struct s_coder	t_coder;
 
 typedef enum	e_scheduler
@@ -61,26 +46,11 @@ typedef enum	e_time_format
 
 }		t_time_format;
 
-typedef enum e_pthread_code
-{
-	INIT,
-	LOCK,
-	UNLOCK,
-	DESTROY,
-	CREATE,
-	JOIN,
-	DETACH,
-	WAIT,
-	TIMEDWAIT,
-	SIGNAL,
-	BROADCAST,
-}		t_pthread_code;
-
 typedef struct	s_request
 {
-	long	arrival_time;
-	long	deadline_time;
-	int		coder_id;
+	long		arrival_time;
+	long		deadline_time;
+	int			coder_id;
 
 }	t_request;
 
@@ -93,40 +63,31 @@ typedef struct	s_heap
 
 }	t_heap;
 
-/*
- * For the structures:
- * 		t_data (data table to pass around functions)
- * 			- *coders (array of pthreads of each coder)
- * 			- *dongles (array of the dongles between the coders)
- * 			- monitor (thread for the monitor)
- * 		t_dongle
- * 		t_coder
-*/
-
-
 typedef struct s_dongle {
 
-  int		dongle_id;
-  bool		taken;
-  long		release_time_in_ms;
-  t_heap	*heap;
-  t_mtx		mtx;
-  t_cond	cond;
+  int			dongle_id;
+  bool			taken;
+  long			release_time_in_ms;
+  t_heap		*heap;
+  t_mtx			mtx;
+  bool			mtx_success;
+  t_cond		cond;
+  bool			cond_success;
 
 } t_dongle;
 
 typedef struct s_coder {
 
-  int 		coder_id;
-  int 		compiles;
-  long		last_compile_start;
-  long 		burnout_deadline;
-  t_dongle	*left;
-  t_dongle	*right;
-  t_coder	*left_rival;
-  t_coder	*right_rival;
-  pthread_t thread;
-  t_data 	*data_table;
+  int 			coder_id;
+  int 			compiles;
+  long			last_compile_start;
+  long 			burnout_deadline;
+  t_dongle		*left;
+  t_dongle		*right;
+  t_coder		*left_rival;
+  t_coder		*right_rival;
+  pthread_t 	thread;
+  t_data 		*data_table;
 
 }		t_coder;
 
@@ -141,13 +102,12 @@ typedef struct s_data {
   long 			dongle_cooldown;
   t_scheduler	scheduler;
   long			start_time;
+  int			dongles_created;
+  int			mtx_created;
   pthread_t		monitor;
   bool 			running;
-  t_cond		dongle_cond;
-  t_cond		monitor_cond;
   t_mtx 		log_mtx;
   t_mtx			table_mtx;
-  t_mtx			dongle_mtx;
   t_mtx			sim_mtx;
   t_coder 		*coders;
   t_dongle 		*dongles;
@@ -155,74 +115,63 @@ typedef struct s_data {
 
 }		t_data;
 
-/*
- * For the functions:
- * 		safe getting and setting and mutex/thread handling (using mutex)
- * 		init (to initialize the coder and dongle structs and the main data struct)
- * 		parsing
- * 		utils (getting time, a precise usleep, error_exit, clean up function, writing status)
- * 		synchro_utils (synchronization of the monitor with the start of the simulation -> once all coders are ready / threads have been created)
- *		monitor
- *		codexion
- *
-*/
-
-// utils.c
-void	error_exit(char *exit_msg);
-void	log_event(t_data *data_table, int id, char *event);
-long	get_time(t_time_format time_code);
-void	precise_usleep(long usec, t_data *data_table);
-int		left(int i);
-int		right(int i, int n);
+// clean.c
+void			clean_up(t_data *data_table);
 
 // coder_routine_utils.c
-void	debug(int i, t_data *data_table, long time_to_debug);
-void	refactor(int i, t_data *data_table, long time_to_refactor);
-void	compile(int i, t_data *data_table, long time_to_compile);
-void	acquire_dongles(t_coder *coder);
-void	release_dongles(t_coder *coder);
+void			debug(int i, t_data *data_table, long time_to_debug);
+void			refactor(int i, t_data *data_table, long time_to_refactor);
+void			compile(int i, t_data *data_table, long time_to_compile);
+int				acquire_dongles(t_coder *coder);
+void			release_dongles(t_coder *coder);
+
+// dongle.c
+int				acquire_dongle(t_coder *coder, t_dongle *dongle);
+void			release_dongle(t_dongle *dongle);
 
 // dongle_utils.c
-bool	dongle_ready(t_dongle *a, long cooldown_ms);
-t_coder	*get_rival(t_coder *coder, t_dongle *a);
-bool	my_turn(t_heap *heap, t_coder *coder, t_dongle *a);
-void	new_request(t_coder *coder, t_heap *heap);
-long	available_at(t_dongle *a, long cooldown_ms);
-
-// routine.c
-void	*coding_routine(void *arg);
-struct timespec	ms_to_ts(long ms);
-struct timespec	give_earliest_deadline(t_coder *coders);
-void	*monitor_routine(void *arg);
+bool			dongle_ready(t_dongle *a, long cooldown_ms);
+long			available_at(t_dongle *a, long cooldown_ms);
+t_coder			*get_rival(t_coder *coder, t_dongle *a);
+bool			my_turn(t_heap *heap, t_coder *coder, t_dongle *a);
+int				new_request(t_coder *coder, t_heap *heap);
 
 // heap.c
-void 		init_heap(t_heap **heap, bool (*cmp)(t_request, t_request));
-int			get_heap_index(t_heap *heap, int coder_id);
-void		insert(t_heap *heap, t_request request);
-t_request	*pop(t_heap *heap);
-void		remove_at_index(t_heap *heap, int index);
-void	print_queue(t_heap *heap);
+int 			init_heap(t_heap **heap, bool (*cmp)(t_request, t_request));
+int				get_heap_index(t_heap *heap, int coder_id);
+int				insert(t_heap *heap, t_request request);
+int				remove_at_index(t_heap *heap, int index);
+void			print_queue(t_heap *heap);
 
-// scheduler.c
-bool	fifo_cmp(t_request a, t_request b);
-bool	edf_cmp(t_request a, t_request b);
-
-// safe_utils.c
-void	*safe_malloc(size_t size);
-void	safe_mutex_handle(t_mtx *mtx, t_pthread_code code);
-void	safe_thread_handle(pthread_t *thread, void *(*start_routine)(void *), void *data, t_pthread_code code);
-void	safe_cond_handle(t_cond *cond, t_mtx *mtx, struct timespec time, t_pthread_code code);
-bool	is_running(t_data *data_table);
-void	stop_sim(t_data *data_table);
-
-// parser.c
-void	parse_input(t_data *data_table, char **av);
+// heap_utils.c
+void			swap(t_request *a, t_request *b);
+void			heapify(t_heap *heap, int i);
 
 // init.c
-void	codexion_init(t_data *data_table);
+int				codexion_init(t_data *data_table);
+
+// parser.c
+int				parse_input(t_data *data_table, char **av);
+
+// routine.c
+void			*coding_routine(void *arg);
+void			*monitor_routine(void *arg);
 
 // run.c
-void	codexion(t_data *data_table);
+void			codexion(t_data *data_table);
 
-// clean.c
-void	clean_up(t_data *data_table);
+// scheduler.c
+bool			fifo_cmp(t_request a, t_request b);
+bool			edf_cmp(t_request a, t_request b);
+
+// sim_utils.c
+void			log_event(t_data *data_table, int id, char *event);
+void			precise_usleep(long usec, t_data *data_table);
+bool			is_running(t_data *data_table);
+void			stop_sim(t_data *data_table);
+
+// utils.c
+int				ft_strncmp(const char *s1, const char *s2, int n);
+int				fail(char *exit_msg);
+long			get_time(t_time_format time_code);
+struct timespec	ms_to_ts(long ms);

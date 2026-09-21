@@ -6,11 +6,18 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 17:53:46 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 15:12:47 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+
+/*
+ * Initializing :
+ * 		- the array of coders (malloc) and initializing values of the coder struct
+ * 		- the array of dongles (malloc) and initializing the values of the dongle struct
+ *
+*/ 
 
 static void	assign_dongles_and_rivals(t_data *data_table, int i)
 {
@@ -23,8 +30,8 @@ static void	assign_dongles_and_rivals(t_data *data_table, int i)
 	right_idx = (i - 1 + n) % n;
 	data_table->coders[i].left_rival = &data_table->coders[left_idx];
 	data_table->coders[i].right_rival = &data_table->coders[right_idx];
-	data_table->coders[i].left = &data_table->dongles[i];
-	data_table->coders[i].right = &data_table->dongles[right_idx];
+	data_table->coders[i].left = &data_table->dongles[left(i)];
+	data_table->coders[i].right = &data_table->dongles[right(i, n)];
 }
 
 static void	init_coder(t_data *data_table, int i)
@@ -37,66 +44,35 @@ static void	init_coder(t_data *data_table, int i)
 	assign_dongles_and_rivals(data_table, i);
 }
 
-static int	init_dongle(t_data *data_table, int i)
+static void	init_dongle(t_data *data_table, int i)
 {
-	data_table->dongles[i].mtx_success = true;
-	data_table->dongles[i].cond_success = true;
+
 	data_table->dongles[i].dongle_id = i;
 	data_table->dongles[i].taken = false;
 	data_table->dongles[i].release_time_in_ms = 0;
 	if (data_table->scheduler == FIFO)
-		if (init_heap(&data_table->dongles[i].heap, fifo_cmp))
-			return (1);
+		init_heap(&data_table->dongles[i].heap, fifo_cmp);
 	else
-		if (init_heap(&data_table->dongles[i].heap, edf_cmp))
-			return (1);
-	if (pthread_mutex_init(&data_table->dongles[i].mtx, NULL))
-	{
-		data_table->dongles[i].mtx_success = false;
-		return (fail("Dongle mutex init failed.\n"));
-	}
-	if (pthread_cond_init(&data_table->dongles[i].cond, NULL))
-	{
-		data_table->dongles[i].cond_success = false;
-		return (fail("Dongle cond init failed.\n"));
-	}
-	data_table->dongles_ready++;
-	return (0);
+		init_heap(&data_table->dongles[i].heap, edf_cmp);
+	safe_mutex_handle(&data_table->dongles[i].mtx, INIT);
+	safe_cond_handle(&data_table->dongles[i].cond, NULL, ms_to_ts(0), INIT);
 }
 
-static int	create_table_mutexes(t_data *data_table)
-{
-	if (pthread_mutex_init(&data_table->sim_mtx), NULL)
-		return (1);
-	data_table->mtx_ready++;
-	if (pthread_mutex_init(&data_table->log_mtx), NULL)
-		return (1);
-	data_table->mtx_ready++;
-	if (pthread_mutex_init(&data_table->table_mtx), NULL)
-		return (1);
-	data_table->mtx_ready++;
-	return (0);
-}
-
-int	codexion_init(t_data *data_table)
+void	codexion_init(t_data *data_table)
 {
 	int	i;
 
 	data_table->running = false;
 	data_table->start_time = 0;
-	data_table->coders = (t_coder *)malloc(sizeof(t_coder) * data_table->number_of_coders);
-	data_table->dongles = (t_dongle *)malloc(sizeof(t_dongle) * data_table->number_of_coders);
-	if (!data_table->coders || !data_table->dongles)
-		return (fail("Malloc failed during data_table *coders and *dongles init.\n"));
+	data_table->coders = (t_coder *)safe_malloc(sizeof(t_coder) * data_table->number_of_coders);
+	data_table->dongles = (t_dongle *)safe_malloc(sizeof(t_dongle) * data_table->number_of_coders);
 	i = -1;
 	while (++i < data_table->number_of_coders)
-	{
-		if (init_dongle(data_table, i))
-			return (1);
-		if (init_coder(data_table, i))
-			return (1);
-	}
-	if (create_table_mutexes(data_table))
-		return(fail("Mutex creation init failure during data_table init.\n"));
-	return (0);
+		init_dongle(data_table, i);
+	i = -1;
+	while (++i < data_table->number_of_coders)
+		init_coder(data_table, i);
+	safe_mutex_handle(&data_table->sim_mtx, INIT);
+	safe_mutex_handle(&data_table->log_mtx, INIT);
+	safe_mutex_handle(&data_table->table_mtx, INIT);
 }

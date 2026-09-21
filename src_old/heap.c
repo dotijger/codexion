@@ -6,24 +6,51 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:07:53 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/19 15:20:06 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int	init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
+static void	swap(t_request *a, t_request *b)
 {
-	*heap = malloc(sizeof(t_heap)); 
-	if (!*heap)
-		return(fail("Malloc failed during creation of *heap.\n"));
+	t_request	tmp;
+
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+static void	heapify(t_heap *heap, int i)
+{
+	int	parent;
+	int	left_child;
+	int	right_child;
+
+	parent = i;
+	left_child = 2 * i + 1;
+	right_child = 2 * i + 2;
+
+	if (left_child < heap->size &&
+			heap->cmp(heap->queue[left_child], heap->queue[parent]))
+		parent = left_child;
+	if (right_child < heap->size &&
+			heap->cmp(heap->queue[right_child], heap->queue[parent]))
+		parent = right_child;
+	if (parent != i)
+	{
+		swap(&heap->queue[i], &heap->queue[parent]);
+		heapify(heap, parent);
+	}
+}
+
+void init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
+{
+	*heap = safe_malloc(sizeof(t_heap)); 
 	(*heap)->capacity = 2;
 	(*heap)->size = 0;
-	(*heap)->queue = malloc(sizeof(t_request) * (*heap)->capacity);
-	if (!(*heap)->queue)
-		return (fail("Malloc failed during creation of heap queue.\n"));
+	(*heap)->queue = safe_malloc(sizeof(t_request) * (*heap)->capacity);
 	(*heap)->cmp = cmp;
-	return (0);
 }
 
 int	get_heap_index(t_heap *heap, int coder_id)
@@ -39,10 +66,10 @@ int	get_heap_index(t_heap *heap, int coder_id)
 	return (i);
 }
 
-int	insert(t_heap *heap, t_request request)
+void	insert(t_heap *heap, t_request request)
 {
 	if (heap->size == heap->capacity)
-		return(fail("Heap overflow."));
+		error_exit("Heap overflow.");
 	
 	int	i;
 	i = heap->size++;
@@ -53,17 +80,32 @@ int	insert(t_heap *heap, t_request request)
 		swap(&heap->queue[i], &heap->queue[(i - 1) / 2]);
 		i = (i - 1) / 2;
 	}
-	return (0);
 }
 
-int	remove_at_index(t_heap *heap, int index)
+t_request	*pop(t_heap *heap)
+{
+	t_request	*root;
+
+	if (heap->size <= 0)
+		error_exit("Cannot extract from empty heap.");
+	root = &heap->queue[0];
+	if (heap->size == 1)
+	{
+		heap->size--;
+		return root;
+	}
+	heap->queue[0] = heap->queue[--heap->size];
+	heapify(heap, 0);
+	return root;
+}
+
+void	remove_at_index(t_heap *heap, int index)
 {
 	if (index >= heap->size)
-		return(fail("Cannot remove node from heap at invalid index."));
+		error_exit("Cannot remove node from heap at invalid index.");
 	heap->queue[index] = heap->queue[heap->size - 1];
 	heap->size--;
 	heapify(heap, index);
-	return (0);
 }
 
 void	print_queue(t_heap *heap)

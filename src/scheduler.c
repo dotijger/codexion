@@ -6,17 +6,11 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:43:55 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/18 18:23:30 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 17:50:15 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-/*
- * returns true if a has higher priority to b (with either one)
- *
-*/
-
 
 bool	fifo_cmp(t_request a, t_request b)
 {

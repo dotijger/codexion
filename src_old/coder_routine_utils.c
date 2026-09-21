@@ -6,15 +6,11 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:15:11 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 12:28:04 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-// TODO fix how to return 1 for acquire dongle (heap stuff, remove at index, new_request) and the length of the function
-// TODO probably an error like data->running (so fail simulation) ???
-// all i did now was add int as return for both acquire dongle and acquire dongles, but acquire dongle is too long already. needs to be able to catch both insert (in new_request()) and remove_at_index)
 
 void	debug(int i, t_data *data_table, long time_to_debug)
 {
@@ -31,18 +27,57 @@ void	refactor(int i, t_data *data_table, long time_to_refactor)
 void	compile(int i, t_data *data_table, long time_to_compile)
 {
 	log_event(data_table, i + 1, "is compiling\n");
-	pthread_mutex_lock(&data_table->table_mtx);
+	safe_mutex_handle(&data_table->table_mtx, LOCK);
 	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
 	data_table->coders[i].burnout_deadline = get_time(MILLISECOND) + data_table->time_to_burnout;
-	pthread_mutex_unlock(&data_table->table_mtx);
-	pthread_cond_signal(&data_table->monitor_cond);
+	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
+	safe_cond_handle(&data_table->monitor_cond, NULL, ms_to_ts(0), SIGNAL);
 	precise_usleep(time_to_compile * 1000, data_table);
-	pthread_mutex_lock(&data_table->table_mtx);
+	safe_mutex_handle(&data_table->table_mtx, LOCK);
 	data_table->coders[i].compiles++;
-	pthread_mutex_unlock(&data_table->table_mtx);
+	safe_mutex_handle(&data_table->table_mtx, UNLOCK);
 }
 
-int	acquire_dongles(t_coder *coder)
+static void	acquire_dongle(t_coder *coder, t_dongle *dongle)
+{
+	struct timespec	time_ready;
+
+	safe_mutex_handle(&dongle->mtx, LOCK);
+	new_request(coder, dongle->heap);
+	while (is_running(coder->data_table)
+			&& !(my_turn(dongle->heap, coder, dongle)
+			&& dongle_ready(dongle, coder->data_table->dongle_cooldown)))
+	{
+		if (my_turn(dongle->heap, coder, dongle))
+		{
+			time_ready = ms_to_ts(available_at(dongle, coder->data_table->dongle_cooldown));
+			safe_cond_handle(&dongle->cond, &dongle->mtx, time_ready, TIMEDWAIT);
+		}
+		else
+			safe_cond_handle(&dongle->cond, &dongle->mtx, ms_to_ts(0), WAIT);
+	}
+	if (!is_running(coder->data_table))
+	{
+		safe_mutex_handle(&dongle->mtx, UNLOCK);
+		return ;
+	}
+	remove_at_index(dongle->heap, 0);
+	dongle->taken = true;
+	safe_mutex_handle(&dongle->mtx, UNLOCK);
+	log_event(coder->data_table, coder->coder_id + 1, "has taken a dongle\n");
+	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
+}
+
+static void	release_dongle(t_dongle *dongle)
+{
+	safe_mutex_handle(&dongle->mtx, LOCK);
+	dongle->taken = false;
+	dongle->release_time_in_ms = get_time(MILLISECOND);
+	safe_mutex_handle(&dongle->mtx, UNLOCK);
+	safe_cond_handle(&dongle->cond, NULL, ms_to_ts(0), BROADCAST);
+}
+
+void	acquire_dongles(t_coder *coder)
 {
 	t_dongle	*first;
 	t_dongle	*second;
@@ -57,22 +92,20 @@ int	acquire_dongles(t_coder *coder)
 		first = coder->left;
 		second = coder->right;
 	}
-	if (acquire_dongle(coder, first))
-		return (1);
+	acquire_dongle(coder, first);
 	if (first != second && is_running(coder->data_table))
-		if (acquire_dongle(coder, second))
-			return (1);
+		acquire_dongle(coder, second);
 	else if (first == second)
 	{
 		while (is_running(coder->data_table))
 			usleep(1000);
 		release_dongle(first);
+		return ;
 	}
-	return (0);
 }
-
 void	release_dongles(t_coder *coder)
 {
 	release_dongle(coder->left);
 	release_dongle(coder->right);
 }
+

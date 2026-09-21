@@ -6,119 +6,94 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 12:29:40 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 17:22:40 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-/*
- * ./codexion 5 800 200 200 200 5 50 efi
- *
- * av[1] = number_of_coders
- * av[2] = time_to_burnout (ms)
- * av[3] = time_to_compile (ms)
- * av[4] = time_to_debug (ms) 
- * av[5] = time_to_refactor (ms)
- * av[6] = number_of_compiles_required
- * av[7] = dongle_cooldown (ms)
- * av[8] = 'efi' or 'fifo' (nothing else!)
- *
- * av[1-7] have to be positive integers 
- * av[8] is a string that can only take value of 'fifo' or 'efi'
- *
- * TODO: what to do when 0 is the provided argument?
- *
-*/
-
-static int	ft_strncmp(const char *s1, const char *s2, int n)
-{
-	if (n == 0)
-		return (0);
-	while (*s1 && *s2 && n > 1 && *s1 == *s2)
-	{
-		s1++;
-		s2++;
-		n--;
-	}
-	return (unsigned char *)s1 == (unsigned char *)s2;
-}
-
-static bool	is_space(char c)
-{
-	if ((c >= 9 && c <= 13) || c == ' ')
-		return true;
-	return false;
-}
-
-static const char	*valid_input(char *str)
+static int	valid_int(char *str)
 {
 	int	i;
-	const char	*start;
+
+	while (*str++)
+	{
+		if (*str >= '0' && *str <= '9')
+			i++;
+	}
+	if (i == 0)
+		return (fail("Argument must contain digits.\n"));
+	if (i > 10 || (i == 10 && ft_strncmp(start, "2147483647", 10) > 0))
+		return(fail("All numeric arguments need to be <= INT_MAX.\n"));
+	return (0);
+}
+
+static int	valid_input(char *str)
+{
+	int	i;
 	int	sign;
 
 	i = 0;
 	sign = 0;
-	start = NULL;
-	while (*str)
+	while (*str++)
 	{
 		if (*str == '-')
-			error_exit("No negative integers allowed.");
+			return (fail("No negative integers allowed.\n"));
 		else if (*str == '+' && sign++)
-				error_exit("No double signs in arguments are allowed.");
+			return (fail("No double signs in arguments are allowed.\n"));
 		else if (*str == '.')
-			error_exit("Only integers are allowed, no floats.");
-		else if (*str >= '0' && *str <= '9')
-		{
-			if (!start)
-				start = str;
-			i++;
-		}
-		str++;
+			return (fail("Only integers are allowed, no floats.\n"));
 	}
-	if (i > 10 || (i == 10 && ft_strncmp(start, "2147483647", 10) > 0))
-		error_exit("All numeric arguments need to be <= INT_MAX.");
-	return start;
+	return (0);
 }
 
-static long	ft_atol(char *str)
+static int	check_arguments(char **av)
 {
-	long	num;
-	const char	*start;
-	
-	while (is_space(*str))
-		str++;
-	start = valid_input(str);
-	if (!start)
-		error_exit("Argument must contain digits.");
-	num = 0;
-	while (*start >= '0' && *start <= '9')
+	int	i;
+
+	while (i < 8)
 	{
-		num = num * 10 + *start - '0';
-		start++;
+		if (valid_input(av[i]))
+			return (1);
+		if (valid_int(av[i]))
+			return (1);
 	}
-	if (num <= INT_MAX)
-		return num;
-	else
-		error_exit("All numeric arguments need to be <= INT_MAX");
-	return -1;
+	return (0);
 }
 
+static int	check_parsed_arguments(t_data *data_table)
+{
+	if (data_table->number_of_coders == 0)
+		return (fail("Number of coders has to be greater than 0.\n"));
+	if (data_table->time_to_burnout == 0)
+		return (fail("Time to burnout has to be greater than 0.\n"));
+	if (data_table->time_to_compile == 0)
+		return (fail("Time to compile has to be greater than 0.\n"));
+	if (data_table->time_to_debug == 0)
+		return (fail("Time to debug has to be greater than 0.\n"));
+	if (data_table->time_to_refactor == 0)
+		return (fail("Time to refactor has to be greater than 0.\n"));
+	return (0);
+}
 
-void	parse_input(t_data *data_table, char **av)
+int	parse_input(t_data *data_table, char **av)
 {
 	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "edf") != 0)
-		error_exit("Invalid argument for 'scheduler':"
-				"please choose between 'fifo' and 'edf'.");
-	data_table->number_of_coders = ft_atol(av[1]);
-	data_table->time_to_burnout = ft_atol(av[2]);
-	data_table->time_to_compile = ft_atol(av[3]);
-	data_table->time_to_debug = ft_atol(av[4]);
-	data_table->time_to_refactor = ft_atol(av[5]);
-	data_table->compiles_required = ft_atol(av[6]);
-	data_table->dongle_cooldown = ft_atol(av[7]);
+		return (fail("Invalid argument for 'scheduler': please choose between 'fifo' and 'edf'."));
+	if (check_arguments(av))
+		return (1);
+	data_table->number_of_coders = (long)atoi(av[1]);
+	data_table->time_to_burnout = (long)atoi(av[2]);
+	data_table->time_to_compile = (long)atoi(av[3]);
+	data_table->time_to_debug = (long)atoi(av[4]);
+	data_table->time_to_refactor = (long)atoi(av[5]);
+	data_table->compiles_required = (long)atoi(av[6]);
+	data_table->dongle_cooldown = (long)atoi(av[7]);
 	if (strcmp(av[8], "fifo"))
 		data_table->scheduler = FIFO;
 	else
 		data_table->scheduler = EDF;
+	if (check_parsed_arguments(data_table))
+		return (1);
+	return (0);
 }

@@ -6,17 +6,32 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:17:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 16:57:46 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/18 18:57:58 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static void	print_exit_message(void)
-{
-	char	*exit_message;
 
-	exit_message = "Error: incorrect number of arguments.\n\n"
+int	main(int ac, char **av)
+{
+  t_data	data_table;
+  char		*exit_message;
+
+  if (ac == 9)
+  {
+    // 1 parsing input
+    parse_input(&data_table, av);
+    // 2 creating data table and coders and dongles
+    codexion_init(&data_table);
+    // 3 starting compiling simulation
+	codexion(&data_table);
+    // 4 cleaning everything up (no leaks)
+    clean_up(&data_table);
+  }
+  else
+  {
+	  exit_message = "Error: incorrect number of arguments.\n\n"
             "Usage: ./codexion <number_of_coders> <time_to_burnout> <time_to_compile> "
             "<time_to_debug> <time_to_refactor> <number_of_compiles_required> "
             "<dongle_cooldown> <scheduler>\n\n"
@@ -32,34 +47,7 @@ static void	print_exit_message(void)
             "  dongle_cooldown              int    ms a dongle stays unusable "
             "after release\n"
             "  scheduler                    str    \"fifo\" or \"edf\"\n";
-	  fprintf(stderr, "%s", exit_message);
-}
-
-int	main(int ac, char **av)
-{
-  t_data	data_table;
-
-  if (ac == 9)
-  {
-	memset(&data_table, 0, sizeof(t_data));
-    if (parse_input(&data_table, av))
-		return (1);
-    if (codexion_init(&data_table))
-	{
-		clean_up(&data_table);
-		return (1);
-	}
-	if (codexion(&data_table))
-	{
-		clean_up(&data_table);
-		return (1);
-	}
-    clean_up(&data_table);
-  }
-  else
-  {
-	  print_exit_message();
-	  return (1);
+	  error_exit(exit_message);
   }
   return (0);
 }

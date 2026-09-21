@@ -6,13 +6,11 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 11:37:58 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:10:51 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/21 12:20:23 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-// TODO : codexion should return int ? maybe
 
 static void	start_codexion(t_data *data_table)
 {
@@ -29,6 +27,8 @@ static void	set_burnout_deadline(t_coder *coders)
 	while (++i < coders->data_table->number_of_coders)
 		coders[i].burnout_deadline = coders->data_table->start_time + coders->data_table->time_to_burnout;
 }
+
+
 
 void	codexion(t_data *data_table)
 {
