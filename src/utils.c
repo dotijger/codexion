@@ -6,11 +6,12 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 17:56:03 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:20:14 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <sys/time.h>
 
 int	ft_strncmp(const char *s1, const char *s2, int n)
 {

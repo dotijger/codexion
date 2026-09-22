@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 11:37:58 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:10:51 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:17:02 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static void	set_burnout_deadline(t_coder *coders)
 		coders[i].burnout_deadline = coders->data_table->start_time + coders->data_table->time_to_burnout;
 }
 
-void	codexion(t_data *data_table)
+int	codexion(t_data *data_table)
 {
 	int	i;
 
@@ -48,4 +48,8 @@ void	codexion(t_data *data_table)
 	while (++i < data_table->number_of_coders)
 		safe_thread_handle(&data_table->coders[i].thread, NULL, NULL, JOIN);
 	safe_thread_handle(&data_table->monitor, NULL, NULL, JOIN);
+
+	if (data_table->failed)
+		return (1);
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 17:53:46 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:16:41 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ int	codexion_init(t_data *data_table)
 	int	i;
 
 	data_table->running = false;
+	data_table->failed = false;
 	data_table->start_time = 0;
 	data_table->coders = (t_coder *)malloc(sizeof(t_coder) * data_table->number_of_coders);
 	data_table->dongles = (t_dongle *)malloc(sizeof(t_dongle) * data_table->number_of_coders);

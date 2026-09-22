@@ -6,12 +6,11 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:15:14 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:16:09 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <errno.h>
 
 static bool	burned_out(t_coder *coders)
 {
@@ -71,7 +70,10 @@ void	*coding_routine(void *arg)
 			&& is_running(data_table))
 	{
 		if (acquire_dongles(coder))
+		{
+			fail_sim(data_table);
 			return (NULL);
+		}
 		compile(coder->coder_id, data_table, coder->data_table->time_to_compile);
 		release_dongles(coder);
 		if (coder->compiles == data_table->compiles_required)

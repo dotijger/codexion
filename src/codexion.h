@@ -6,21 +6,16 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:14:57 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:21:04 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h> // for printf, fprintf
-#include <unistd.h> // for write, usleep
-#include <pthread.h> // for mutex: _init, _lock, _unlock, _destroy
-					// for threads: _create, _join
-					// for cond: _init, _wait, _timedwait, _signal, _broadcast, _destroy
-#include <stdlib.h> // for malloc, free, atoi
-#include <string.h> // for strcmp, strlen, memset
-#include <sys/time.h> // for gettimeofday, struct timespec / timeval
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdlib.h>
 #include <stdbool.h>
-#include <stdint.h> // for booleans and uint64_t and INT_MAX
-#include <limits.h>
+#include <stdint.h>
 
 #define RED     "\033[31m"
 #define RESET   "\033[0m"
@@ -106,6 +101,7 @@ typedef struct s_data {
   int			mtx_created;
   pthread_t		monitor;
   bool 			running;
+  bool			failed;
   t_mtx 		log_mtx;
   t_mtx			table_mtx;
   t_mtx			sim_mtx;
@@ -158,7 +154,7 @@ void			*coding_routine(void *arg);
 void			*monitor_routine(void *arg);
 
 // run.c
-void			codexion(t_data *data_table);
+int				codexion(t_data *data_table);
 
 // scheduler.c
 bool			fifo_cmp(t_request a, t_request b);
@@ -169,6 +165,7 @@ void			log_event(t_data *data_table, int id, char *event);
 void			precise_usleep(long usec, t_data *data_table);
 bool			is_running(t_data *data_table);
 void			stop_sim(t_data *data_table);
+void			fail_sim(t_data *data_table);
 
 // utils.c
 int				ft_strncmp(const char *s1, const char *s2, int n);

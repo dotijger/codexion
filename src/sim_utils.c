@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/21 17:51:13 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:11:38 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:16:03 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,14 @@ bool	is_running(t_data *data_table)
 void	stop_sim(t_data *data_table)
 {
 	pthread_mutex_lock(&data_table->sim_mtx);
+	data_table->running = false;
+	pthread_mutex_unlock(&data_table->sim_mtx);
+}
+
+void	fail_sim(t_data *data_table)
+{
+	pthread_mutex_lock(&data_table->sim_mtx);
+	data_table->failed = true;
 	data_table->running = false;
 	pthread_mutex_unlock(&data_table->sim_mtx);
 }

@@ -6,11 +6,12 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 17:22:40 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/22 11:19:11 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <string.h>
 
 static int	valid_int(char *str)
 {
