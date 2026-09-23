@@ -6,15 +6,11 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:15:11 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 13:55:21 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-// TODO fix how to return 1 for acquire dongle (heap stuff, remove at index, new_request) and the length of the function
-// TODO probably an error like data->running (so fail simulation) ???
-// all i did now was add int as return for both acquire dongle and acquire dongles, but acquire dongle is too long already. needs to be able to catch both insert (in new_request()) and remove_at_index)
 
 void	debug(int i, t_data *data_table, long time_to_debug)
 {
@@ -33,9 +29,9 @@ void	compile(int i, t_data *data_table, long time_to_compile)
 	log_event(data_table, i + 1, "is compiling\n");
 	pthread_mutex_lock(&data_table->table_mtx);
 	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
-	data_table->coders[i].burnout_deadline = get_time(MILLISECOND) + data_table->time_to_burnout;
+	data_table->coders[i].burnout_deadline = get_time(MILLISECOND)
+		+ data_table->time_to_burnout;
 	pthread_mutex_unlock(&data_table->table_mtx);
-	pthread_cond_signal(&data_table->monitor_cond);
 	precise_usleep(time_to_compile * 1000, data_table);
 	pthread_mutex_lock(&data_table->table_mtx);
 	data_table->coders[i].compiles++;
@@ -47,21 +43,14 @@ int	acquire_dongles(t_coder *coder)
 	t_dongle	*first;
 	t_dongle	*second;
 
-	if (coder->coder_id % 2 == 0)
-	{
-		first = coder->right;
-		second = coder->left;
-	}
-	else
-	{
-		first = coder->left;
-		second = coder->right;
-	}
+	assign_order(coder, &first, &second);
 	if (acquire_dongle(coder, first))
 		return (1);
 	if (first != second && is_running(coder->data_table))
+	{
 		if (acquire_dongle(coder, second))
 			return (1);
+	}
 	else if (first == second)
 	{
 		while (is_running(coder->data_table))

@@ -6,12 +6,13 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/22 11:20:14 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:12:18 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 #include <sys/time.h>
+#include <string.h>
 
 int	ft_strncmp(const char *s1, const char *s2, int n)
 {
@@ -23,7 +24,7 @@ int	ft_strncmp(const char *s1, const char *s2, int n)
 		s2++;
 		n--;
 	}
-	return (unsigned char *)s1 == (unsigned char *)s2;
+	return ((unsigned char *)s1 == (unsigned char *)s2);
 }
 
 int	fail(char *exit_msg)
@@ -32,17 +33,17 @@ int	fail(char *exit_msg)
 	return (1);
 }
 
-long get_time(t_time_format time_format)
+long	get_time(t_time_format time_format)
 {
 	struct timeval	tv;
 
 	memset(&tv, 0, sizeof(tv));
 	gettimeofday(&tv, NULL);
-  	if (time_format == MILLISECOND)
-		return ((long)tv.tv_sec * 1000) + ((long)tv.tv_usec / 1000);
-  	else if (time_format == MICROSECOND)
-		return ((long)tv.tv_sec * 1000000) + ((long)tv.tv_usec);
-  	return ((long)tv.tv_sec);
+	if (time_format == MILLISECOND)
+		return (((long)tv.tv_sec * 1000) + ((long)tv.tv_usec / 1000));
+	else if (time_format == MICROSECOND)
+		return (((long)tv.tv_sec * 1000000) + ((long)tv.tv_usec));
+	return ((long)tv.tv_sec);
 }
 
 struct timespec	ms_to_ts(long ms)
@@ -51,6 +52,5 @@ struct timespec	ms_to_ts(long ms)
 
 	ret_ts.tv_sec = ms / 1000;
 	ret_ts.tv_nsec = (ms % 1000) * 1000000;
-
-	return ret_ts;
+	return (ret_ts);
 }

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:52:10 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:06:30 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 13:58:15 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@ bool	dongle_ready(t_dongle *a, long cooldown_ms)
 
 long	available_at(t_dongle *a, long cooldown_ms)
 {
-	return(a->release_time_in_ms + cooldown_ms);
+	return (a->release_time_in_ms + cooldown_ms);
 }
 
 t_coder	*get_rival(t_coder *coder, t_dongle *a)
 {
 	if (a == coder->left)
-		return coder->left_rival;
-	return coder->right_rival;
+		return (coder->left_rival);
+	return (coder->right_rival);
 }
 
 bool	my_turn(t_heap *heap, t_coder *coder, t_dongle *a)
@@ -57,5 +57,6 @@ int	new_request(t_coder *coder, t_heap *heap)
 	request.deadline_time = coder->burnout_deadline;
 	pthread_mutex_unlock(&coder->data_table->table_mtx);
 	if (insert(heap, request))
-		return (1);	
+		return (1);
+	return (0);
 }

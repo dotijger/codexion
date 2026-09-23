@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/21 18:07:23 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:15:15 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:09:57 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,11 @@ void	heapify(t_heap *heap, int i)
 	parent = i;
 	left_child = 2 * i + 1;
 	right_child = 2 * i + 2;
-
-	if (left_child < heap->size &&
-			heap->cmp(heap->queue[left_child], heap->queue[parent]))
+	if (left_child < heap->size
+		&& heap->cmp(heap->queue[left_child], heap->queue[parent]))
 		parent = left_child;
-	if (right_child < heap->size &&
-			heap->cmp(heap->queue[right_child], heap->queue[parent]))
+	if (right_child < heap->size
+		&& heap->cmp(heap->queue[right_child], heap->queue[parent]))
 		parent = right_child;
 	if (parent != i)
 	{

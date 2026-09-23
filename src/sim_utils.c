@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/21 17:51:13 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/22 11:16:03 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:02:38 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,15 @@
 
 void	log_event(t_data *data_table, int id, char *event)
 {
-	t_mtx	*mtx;
 	long	now;
 
 	if (!is_running(data_table))
 		return ;
-	mtx = &data_table->log_mtx;
-	safe_mutex_handle(mtx, LOCK);
+	pthread_mutex_lock(&data_table->log_mtx);
 	now = get_time(MILLISECOND);
 	printf("%ld %d %s", (now - data_table->start_time), id, event);
 	fflush(stdout);
-	safe_mutex_handle(mtx, UNLOCK);
+	pthread_mutex_unlock(&data_table->log_mtx);
 }
 
 void	precise_usleep(long usec, t_data *data_table)
@@ -32,7 +30,7 @@ void	precise_usleep(long usec, t_data *data_table)
 	long	start;
 	long	elapsed;
 	long	rem;
-	
+
 	start = get_time(MICROSECOND);
 	while (get_time(MICROSECOND) - start < usec)
 	{
@@ -46,11 +44,10 @@ void	precise_usleep(long usec, t_data *data_table)
 		}
 		else
 		{
-			while(get_time(MICROSECOND) - start < usec)
+			while (get_time(MICROSECOND) - start < usec)
 				usleep(50);
 		}
 	}
-	return (0);
 }
 
 bool	is_running(t_data *data_table)
@@ -60,7 +57,6 @@ bool	is_running(t_data *data_table)
 	pthread_mutex_lock(&data_table->sim_mtx);
 	status = data_table->running;
 	pthread_mutex_unlock(&data_table->sim_mtx);
-
 	return (status);
 }
 

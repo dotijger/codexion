@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 18:07:53 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 13:49:27 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int	init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
 {
-	*heap = malloc(sizeof(t_heap)); 
+	*heap = malloc(sizeof(t_heap));
 	if (!*heap)
-		return(fail("Malloc failed during creation of *heap.\n"));
+		return (fail("Malloc failed during creation of *heap.\n"));
 	(*heap)->capacity = 2;
 	(*heap)->size = 0;
 	(*heap)->queue = malloc(sizeof(t_request) * (*heap)->capacity);
@@ -29,7 +29,7 @@ int	init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
 int	get_heap_index(t_heap *heap, int coder_id)
 {
 	int	i;
-	
+
 	i = -1;
 	while (++i < heap->size)
 	{
@@ -41,13 +41,12 @@ int	get_heap_index(t_heap *heap, int coder_id)
 
 int	insert(t_heap *heap, t_request request)
 {
-	if (heap->size == heap->capacity)
-		return(fail("Heap overflow."));
-	
 	int	i;
+
+	if (heap->size == heap->capacity)
+		return (fail("Heap overflow."));
 	i = heap->size++;
 	heap->queue[i] = request;
-
 	while (i != 0 && !heap->cmp(heap->queue[(i - 1) / 2], heap->queue[i]))
 	{
 		swap(&heap->queue[i], &heap->queue[(i - 1) / 2]);
@@ -59,7 +58,7 @@ int	insert(t_heap *heap, t_request request)
 int	remove_at_index(t_heap *heap, int index)
 {
 	if (index >= heap->size)
-		return(fail("Cannot remove node from heap at invalid index."));
+		return (fail("Cannot remove node from heap at invalid index."));
 	heap->queue[index] = heap->queue[heap->size - 1];
 	heap->size--;
 	heapify(heap, index);
@@ -68,7 +67,7 @@ int	remove_at_index(t_heap *heap, int index)
 
 void	print_queue(t_heap *heap)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (++i < heap->size)

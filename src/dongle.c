@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/21 17:58:46 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/22 11:20:26 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:02:04 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,15 @@ static bool	dongle_available(t_coder *coder, t_dongle *dongle)
 static void	wait_for_dongle(t_coder *coder, t_dongle *dongle)
 {
 	struct timespec	time_ready;
-	t_data	*data_table;
+	t_data			*data_table;
 
 	data_table = coder->data_table;
 	while (is_running(coder->data_table) && !dongle_available(coder, dongle))
 	{
 		if (my_turn(dongle->heap, coder, dongle))
 		{
-			time_ready = ms_to_ts(available_at(dongle, data_table->dongle_cooldown));
+			time_ready = ms_to_ts(available_at(
+						dongle, data_table->dongle_cooldown));
 			pthread_cond_timedwait(&dongle->cond, &dongle->mtx, &time_ready);
 		}
 		else
@@ -53,8 +54,6 @@ static int	get_dongle(t_coder *coder, t_dongle *dongle)
 
 int	acquire_dongle(t_coder *coder, t_dongle *dongle)
 {
-	struct timespec	time_ready;
-
 	pthread_mutex_lock(&dongle->mtx);
 	if (new_request(coder, dongle->heap))
 	{

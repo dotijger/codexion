@@ -27,4 +27,6 @@ fclean: clean
 
 re: fclean $(NAME)
 
+lint:
+	norminette src
 

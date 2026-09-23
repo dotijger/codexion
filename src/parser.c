@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/22 11:19:11 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:01:41 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,30 @@
 
 static int	valid_int(char *str)
 {
-	int	i;
+	int		i;
+	char	*start;
 
+	i = 0;
 	while (*str++)
 	{
 		if (*str >= '0' && *str <= '9')
+		{
+			if (i == 0)
+				start = str;
 			i++;
+		}
 	}
 	if (i == 0)
 		return (fail("Argument must contain digits.\n"));
 	if (i > 10 || (i == 10 && ft_strncmp(start, "2147483647", 10) > 0))
-		return(fail("All numeric arguments need to be <= INT_MAX.\n"));
+		return (fail("All numeric arguments need to be <= INT_MAX.\n"));
 	return (0);
 }
 
 static int	valid_input(char *str)
 {
-	int	i;
 	int	sign;
 
-	i = 0;
 	sign = 0;
 	while (*str++)
 	{
@@ -52,7 +56,8 @@ static int	check_arguments(char **av)
 {
 	int	i;
 
-	while (i < 8)
+	i = 0;
+	while (++i < 8)
 	{
 		if (valid_input(av[i]))
 			return (1);
@@ -80,7 +85,9 @@ static int	check_parsed_arguments(t_data *data_table)
 int	parse_input(t_data *data_table, char **av)
 {
 	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "edf") != 0)
-		return (fail("Invalid argument for 'scheduler': please choose between 'fifo' and 'edf'."));
+		return (fail(
+				"Invalid argument for 'scheduler':"
+				"please choose between 'fifo' and 'edf'."));
 	if (check_arguments(av))
 		return (1);
 	data_table->number_of_coders = (long)atoi(av[1]);
