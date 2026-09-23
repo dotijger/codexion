@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:01:41 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:22:56 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static int	valid_int(char *str)
 	char	*start;
 
 	i = 0;
-	while (*str++)
+	while (*str)
 	{
 		if (*str >= '0' && *str <= '9')
 		{
@@ -27,6 +27,7 @@ static int	valid_int(char *str)
 				start = str;
 			i++;
 		}
+		str++;
 	}
 	if (i == 0)
 		return (fail("Argument must contain digits.\n"));
