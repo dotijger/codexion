@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:00:28 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 14:14:08 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#define RED     "\033[31m"
+#define RESET   "\033[0m"
 
 typedef pthread_mutex_t	t_mtx;
 typedef pthread_cond_t	t_cond;
@@ -126,8 +129,7 @@ int				new_request(t_coder *coder, t_heap *heap);
 void			assign_order(
 					t_coder *coder,
 					t_dongle **first,
-					t_dongle **second,
-					);
+					t_dongle **second);
 
 // heap.c
 int				init_heap(t_heap **heap, bool (*cmp)(t_request, t_request));
