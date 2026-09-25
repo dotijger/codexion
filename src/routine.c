@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:04:26 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/24 16:50:48 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ void	*coding_routine(void *arg)
 	data_table = coder->data_table;
 	while (!is_running(data_table))
 		usleep(100);
-	while (coder->compiles < data_table->compiles_required
-		&& is_running(data_table))
+	while (is_running(data_table)
+		&& coder->compiles < data_table->compiles_required)
 	{
 		if (acquire_dongles(coder))
 		{
@@ -103,7 +103,7 @@ void	*monitor_routine(void *arg)
 			stop_sim(data_table);
 		pthread_mutex_unlock(&data_table->table_mtx);
 		if (is_running(data_table))
-			precise_usleep(200, data_table);
+			precise_usleep(5000, data_table);
 	}
 	broadcast_to_dongles(data_table);
 	return (NULL);

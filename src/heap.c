@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 13:49:27 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/24 12:26:02 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,22 @@ int	init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
 
 int	get_heap_index(t_heap *heap, int coder_id)
 {
-	int	i;
+	int		i;
+	bool	found;
 
 	i = -1;
+	found = false;
 	while (++i < heap->size)
 	{
 		if (heap->queue[i].coder_id == coder_id)
+		{
+			found = true;
 			break ;
+		}
 	}
-	return (i);
+	if (found)
+		return (i);
+	return (-1);
 }
 
 int	insert(t_heap *heap, t_request request)

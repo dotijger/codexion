@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:22:56 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 16:12:36 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static int	valid_input(char *str)
 	int	sign;
 
 	sign = 0;
-	while (*str++)
+	while (*str)
 	{
 		if (*str == '-')
 			return (fail("No negative integers allowed.\n"));
@@ -49,6 +49,7 @@ static int	valid_input(char *str)
 			return (fail("No double signs in arguments are allowed.\n"));
 		else if (*str == '.')
 			return (fail("Only integers are allowed, no floats.\n"));
+		str++;
 	}
 	return (0);
 }
@@ -87,7 +88,7 @@ int	parse_input(t_data *data_table, char **av)
 {
 	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "edf") != 0)
 		return (fail(
-				"Invalid argument for 'scheduler':"
+				"Invalid argument for 'scheduler': "
 				"please choose between 'fifo' and 'edf'."));
 	if (check_arguments(av))
 		return (1);

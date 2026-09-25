@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 11:37:58 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:06:09 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/23 16:06:20 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ int	codexion(t_data *data_table)
 	int	i;
 
 	i = -1;
+	if (data_table->compiles_required == 0)
+		return (0);
 	while (++i < data_table->number_of_coders)
 		pthread_create(&data_table->coders[i].thread,
 			NULL, &coding_routine, (void *)&data_table->coders[i]);

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:14:08 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/24 13:51:19 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,8 @@ int				acquire_dongles(t_coder *coder);
 void			release_dongles(t_coder *coder);
 
 // dongle.c
-int				acquire_dongle(t_coder *coder, t_dongle *dongle);
+int				take_dongles(t_coder *coder,
+					t_dongle *dongle, t_dongle *other);
 void			release_dongle(t_dongle *dongle);
 
 // dongle_utils.c
@@ -130,6 +131,8 @@ void			assign_order(
 					t_coder *coder,
 					t_dongle **first,
 					t_dongle **second);
+int				enter_queue(t_coder *coder, t_dongle *first, t_dongle *second);
+long			min_cooldown(long one, long two);
 
 // heap.c
 int				init_heap(t_heap **heap, bool (*cmp)(t_request, t_request));
