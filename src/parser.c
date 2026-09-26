@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                    *        /\       *     */
-/*   parser.c                                        \        /##\        /   */
-/*                                                    \      /####\      /    */
-/*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
-/*                                                        |X||##||X|          */
-/*   Created: 2026/09/09 14:45:29 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 16:12:36 by odschreu            ..+::##::+..         */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: otc <otc@student.42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/09 14:45:29 by odschreu          #+#    #+#             */
+/*   Updated: 2026/09/26 15:56:30 by otc              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ int	parse_input(t_data *data_table, char **av)
 	data_table->time_to_refactor = (long)atoi(av[5]);
 	data_table->compiles_required = (long)atoi(av[6]);
 	data_table->dongle_cooldown = (long)atoi(av[7]);
-	if (strcmp(av[8], "fifo"))
+	if (strcmp(av[8], "fifo") == 0)
 		data_table->scheduler = FIFO;
 	else
 		data_table->scheduler = EDF;

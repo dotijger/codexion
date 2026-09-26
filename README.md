@@ -42,7 +42,9 @@ All arguments are mandatory. Times are in milliseconds. `scheduler` must be exac
 
 ## Blocking cases handled
 
+
 - deadlock prevention and Coffman's conditions
+
 - starvation prevention
 - cooldown handling
 - precise burnout detection
