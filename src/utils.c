@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:12:18 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 19:27:03 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	ft_strncmp(const char *s1, const char *s2, int n)
 		s2++;
 		n--;
 	}
-	return ((unsigned char *)s1 == (unsigned char *)s2);
+	return ((unsigned char)*s1 == (unsigned char)*s2);
 }
 
 int	fail(char *exit_msg)
