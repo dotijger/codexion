@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/21 17:58:46 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 18:32:05 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 19:29:33 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ int	take_dongles(t_coder *coder, t_dongle *dongle, t_dongle *other)
 	{
 		pthread_mutex_unlock(&dongle->mtx);
 		pthread_mutex_unlock(&other->mtx);
-		return (1);
+		return (0);
 	}
 	return (get_dongles(coder, dongle, other));
 }
