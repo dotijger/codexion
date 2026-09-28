@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 18:21:42 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 19:35:16 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,11 @@ void	*coding_routine(void *arg)
 
 	coder = (t_coder *)arg;
 	data_table = coder->data_table;
-	while (!is_running(data_table))
+	while (!is_running(data_table) && !data_table->failed)
 		usleep(100);
 	while (is_running(data_table)
-		&& coder->compiles < data_table->compiles_required)
+		&& coder->compiles < data_table->compiles_required
+		&& !data_table->failed)
 	{
 		if (acquire_dongles(coder))
 		{
@@ -92,9 +93,10 @@ void	*monitor_routine(void *arg)
 	t_data	*data_table;
 
 	data_table = (t_data *)arg;
-	while (!is_running(data_table))
+	while (!is_running(data_table) && !data_table->failed)
 		usleep(100);
-	while (is_running(data_table))
+	while (is_running(data_table)
+		&& !data_table->failed)
 	{
 		pthread_mutex_lock(&data_table->table_mtx);
 		if (done(data_table->coders))

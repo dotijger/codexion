@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 11:37:58 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 14:42:31 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 19:33:57 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,10 @@ int	codexion(t_data *data_table)
 	while (++i < data_table->number_of_coders)
 		if (pthread_create(&data_table->coders[i].thread,
 			NULL, &coding_routine, (void *)&data_table->coders[i]))
-			return (1);
+			data_table->failed = true;
 	if (pthread_create(&data_table->monitor,
 		NULL, &monitor_routine, (void *)data_table))
-		return (1);
+		data_table->failed = true;
 	data_table->start_time = get_time(MILLISECOND);
 	set_burnout_deadline(data_table->coders);
 	start_codexion(data_table);
