@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/18 18:48:32 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/21 16:45:32 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 15:46:08 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,13 @@ static void	destroy_mutexes(t_data *data_table)
 	}
 }
 
+void	free_heap(t_dongle *dongle)
+{
+	free(dongle->heap->queue);
+	free(dongle->heap);
+	dongle->heap = NULL;
+}
+
 void	clean_up(t_data *data_table)
 {
 	int	i;
@@ -35,8 +42,7 @@ void	clean_up(t_data *data_table)
 	i = -1;
 	while (++i < data_table->dongles_created)
 	{
-		free(data_table->dongles[i].heap->queue);
-		free(data_table->dongles[i].heap);
+		free_heap(&data_table->dongles[i]);
 		if (data_table->dongles[i].mtx_success)
 			pthread_mutex_destroy(&data_table->dongles[i].mtx);
 		if (data_table->dongles[i].cond_success)

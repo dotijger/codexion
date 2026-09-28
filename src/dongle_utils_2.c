@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/23 13:56:39 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/24 12:46:18 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 14:32:46 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	enter_queue(t_coder *coder, t_dongle *first, t_dongle *second)
 	pthread_mutex_lock(&second->mtx);
 	if (new_request(coder, second->heap))
 	{
-		pthread_mutex_unlock(&first->mtx);
+		pthread_mutex_unlock(&second->mtx);
 		return (1);
 	}
 	pthread_mutex_unlock(&second->mtx);

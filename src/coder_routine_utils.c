@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/24 13:55:09 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 14:39:19 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,15 @@ void	refactor(int i, t_data *data_table, long time_to_refactor)
 
 void	compile(int i, t_data *data_table, long time_to_compile)
 {
-	log_event(data_table, i + 1, "is compiling\n");
+	long	now;
+
 	pthread_mutex_lock(&data_table->table_mtx);
-	data_table->coders[i].last_compile_start = get_time(MILLISECOND);
-	data_table->coders[i].burnout_deadline = get_time(MILLISECOND)
+	now = get_time(MILLISECOND);
+	data_table->coders[i].last_compile_start = now;
+	data_table->coders[i].burnout_deadline = now
 		+ data_table->time_to_burnout;
 	pthread_mutex_unlock(&data_table->table_mtx);
+	log_event(data_table, i + 1, "is compiling\n");
 	precise_usleep(time_to_compile * 1000, data_table);
 	pthread_mutex_lock(&data_table->table_mtx);
 	data_table->coders[i].compiles++;

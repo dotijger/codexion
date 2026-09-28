@@ -6,19 +6,22 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/24 13:51:19 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 15:46:21 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
+#ifndef CODEXION_H
+# define CODEXION_H
 
-#define RED     "\033[31m"
-#define RESET   "\033[0m"
+# include <stdio.h>
+# include <unistd.h>
+# include <pthread.h>
+# include <stdlib.h>
+# include <stdbool.h>
+# include <stdint.h>
+
+# define RED     "\033[31m"
+# define RESET   "\033[0m"
 
 typedef pthread_mutex_t	t_mtx;
 typedef pthread_cond_t	t_cond;
@@ -105,6 +108,7 @@ typedef struct s_data
 }	t_data;
 
 // clean.c
+void			free_heap(t_dongle *dongle);
 void			clean_up(t_data *data_table);
 
 // coder_routine_utils.c
@@ -174,3 +178,5 @@ int				ft_strncmp(const char *s1, const char *s2, int n);
 int				fail(char *exit_msg);
 long			get_time(t_time_format time_code);
 struct timespec	ms_to_ts(long ms);
+
+#endif

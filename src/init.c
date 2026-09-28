@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 13:52:05 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 15:47:06 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,22 +45,22 @@ static int	init_dongle(t_data *data_table, int i)
 	data_table->dongles[i].dongle_id = i;
 	data_table->dongles[i].taken = false;
 	data_table->dongles[i].release_time_in_ms = 0;
-	if (data_table->scheduler == FIFO)
-	{
-		if (init_heap(&data_table->dongles[i].heap, fifo_cmp))
+	if (data_table->scheduler == FIFO
+		&& init_heap(&data_table->dongles[i].heap, fifo_cmp))
 			return (1);
-	}
-	else
-		if (init_heap(&data_table->dongles[i].heap, edf_cmp))
-			return (1);
+	if (data_table->scheduler == EDF
+		&& init_heap(&data_table->dongles[i].heap, edf_cmp))
+		return (1);
 	if (pthread_mutex_init(&data_table->dongles[i].mtx, NULL))
 	{
 		data_table->dongles[i].mtx_success = false;
+		free_heap(&data_table->dongles[i]);
 		return (fail("Dongle mutex init failed.\n"));
 	}
 	if (pthread_cond_init(&data_table->dongles[i].cond, NULL))
 	{
 		data_table->dongles[i].cond_success = false;
+		free_heap(&data_table->dongles[i]);
 		return (fail("Dongle cond init failed.\n"));
 	}
 	data_table->dongles_created++;

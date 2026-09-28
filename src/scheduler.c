@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:43:55 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/24 16:29:29 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 14:31:50 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,9 @@ bool	fifo_cmp(t_request a, t_request b)
 {
 	if (a.arrival_time < b.arrival_time)
 		return (true);
-	return (false);
+	else if (a.arrival_time > b.arrival_time)
+		return (false);
+	return (a.coder_id < b.coder_id);
 }
 
 bool	edf_cmp(t_request a, t_request b)

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/24 16:50:48 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/28 18:21:42 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,11 @@ void	*coding_routine(void *arg)
 		compile(coder->coder_id,
 			data_table, coder->data_table->time_to_compile);
 		release_dongles(coder);
-		if (coder->compiles == data_table->compiles_required)
-			return (NULL);
 		debug(coder->coder_id, data_table, coder->data_table->time_to_debug);
 		refactor(coder->coder_id,
 			data_table, coder->data_table->time_to_refactor);
+		if (coder->compiles == data_table->compiles_required)
+			return (NULL);
 	}
 	return (NULL);
 }
@@ -103,7 +103,7 @@ void	*monitor_routine(void *arg)
 			stop_sim(data_table);
 		pthread_mutex_unlock(&data_table->table_mtx);
 		if (is_running(data_table))
-			precise_usleep(5000, data_table);
+			precise_usleep(1000, data_table);
 	}
 	broadcast_to_dongles(data_table);
 	return (NULL);
