@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/15 09:50:37 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/24 12:26:02 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 09:57:42 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ int	init_heap(t_heap **heap, bool (*cmp)(t_request, t_request))
 	(*heap)->size = 0;
 	(*heap)->queue = malloc(sizeof(t_request) * (*heap)->capacity);
 	if (!(*heap)->queue)
+	{
+		free(*heap);
 		return (fail("Malloc failed during creation of heap queue.\n"));
+	}
 	(*heap)->cmp = cmp;
 	return (0);
 }
@@ -51,7 +54,7 @@ int	insert(t_heap *heap, t_request request)
 	int	i;
 
 	if (heap->size == heap->capacity)
-		return (fail("Heap overflow."));
+		return (fail("Heap overflow.\n"));
 	i = heap->size++;
 	heap->queue[i] = request;
 	while (i != 0 && !heap->cmp(heap->queue[(i - 1) / 2], heap->queue[i]))
@@ -65,7 +68,7 @@ int	insert(t_heap *heap, t_request request)
 int	remove_at_index(t_heap *heap, int index)
 {
 	if (index >= heap->size)
-		return (fail("Cannot remove node from heap at invalid index."));
+		return (fail("Cannot remove node from heap at invalid index.\n"));
 	heap->queue[index] = heap->queue[heap->size - 1];
 	heap->size--;
 	heapify(heap, index);

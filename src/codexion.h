@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 15:46:21 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 09:43:33 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ bool			dongle_ready(t_dongle *a, long cooldown_ms);
 long			available_at(t_dongle *a, long cooldown_ms);
 t_coder			*get_rival(t_coder *coder, t_dongle *a);
 bool			my_turn(t_heap *heap, t_coder *coder, t_dongle *a);
-int				new_request(t_coder *coder, t_heap *heap);
+int				new_request(t_coder *coder, t_heap *heap, long arrival);
 
 // dongle_utils_2.c
 void			assign_order(

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 19:35:16 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 10:04:28 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,23 +67,22 @@ void	*coding_routine(void *arg)
 	data_table = coder->data_table;
 	while (!is_running(data_table) && !data_table->failed)
 		usleep(100);
-	while (is_running(data_table)
-		&& coder->compiles < data_table->compiles_required
-		&& !data_table->failed)
+	while (is_running(data_table) && !data_table->failed
+		&& coder->compiles < data_table->compiles_required)
 	{
 		if (acquire_dongles(coder))
 		{
 			fail_sim(data_table);
 			return (NULL);
 		}
+		if (!is_running(data_table))
+			return (NULL);
 		compile(coder->coder_id,
 			data_table, coder->data_table->time_to_compile);
 		release_dongles(coder);
 		debug(coder->coder_id, data_table, coder->data_table->time_to_debug);
 		refactor(coder->coder_id,
 			data_table, coder->data_table->time_to_refactor);
-		if (coder->compiles == data_table->compiles_required)
-			return (NULL);
 	}
 	return (NULL);
 }

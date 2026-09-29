@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 15:47:06 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 09:39:20 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ static int	init_dongle(t_data *data_table, int i)
 	{
 		data_table->dongles[i].cond_success = false;
 		free_heap(&data_table->dongles[i]);
+		pthread_mutex_destroy(&data_table->dongles[i].mtx);
 		return (fail("Dongle cond init failed.\n"));
 	}
 	data_table->dongles_created++;

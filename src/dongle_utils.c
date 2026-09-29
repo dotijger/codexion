@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:52:10 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 13:58:15 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 09:43:19 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ bool	my_turn(t_heap *heap, t_coder *coder, t_dongle *a)
 	return (heap->cmp(heap->queue[coder_idx], heap->queue[rival_idx]));
 }
 
-int	new_request(t_coder *coder, t_heap *heap)
+int	new_request(t_coder *coder, t_heap *heap, long arrival)
 {
 	t_request	request;
 
 	request.coder_id = coder->coder_id;
-	request.arrival_time = get_time(MILLISECOND);
+	request.arrival_time = arrival;
 	pthread_mutex_lock(&coder->data_table->table_mtx);
 	request.deadline_time = coder->burnout_deadline;
 	pthread_mutex_unlock(&coder->data_table->table_mtx);

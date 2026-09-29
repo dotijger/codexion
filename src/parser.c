@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
+/*                                                    *        /\       *     */
 /*   parser.c                                        \        /##\        /   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: otc <otc@student.42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/09/09 14:45:29 by odschreu          #+#    #+#             */
-/*   Updated: 2026/09/28 19:31:40 by odschreu            ..+::##::+..         */
+/*                                                    \      /####\      /    */
+/*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
+/*                                                        |X||##||X|          */
+/*   Created: 2026/09/29 10:07:50 by odschreu             |X||##||X|          */
+/*   Updated: 2026/09/29 10:07:53 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,12 @@
 static int	valid_int(char *str)
 {
 	int		i;
-	char	*start;
 
 	i = 0;
 	while (*str)
 	{
 		if (*str >= '0' && *str <= '9')
-		{
-			if (i == 0)
-				start = str;
 			i++;
-		}
 		else
 			return (fail("Argument must consist of only digits.\n"));
 		str++;
@@ -91,7 +86,7 @@ int	parse_input(t_data *data_table, char **av)
 	if (strcmp(av[8], "fifo") != 0 && strcmp(av[8], "edf") != 0)
 		return (fail(
 				"Invalid argument for 'scheduler': "
-				"please choose between 'fifo' and 'edf'."));
+				"please choose between 'fifo' and 'edf'.\n"));
 	if (check_arguments(av))
 		return (1);
 	data_table->number_of_coders = (long)atoi(av[1]);
