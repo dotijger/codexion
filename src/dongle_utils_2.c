@@ -6,11 +6,20 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/23 13:56:39 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 09:44:24 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 12:14:49 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+
+long	min_wait_time(t_dongle *one, t_dongle *two, long cooldown)
+{
+	long	ret;
+
+	ret = min_cooldown(available_at(one, cooldown),
+			available_at(two, cooldown));
+	return (ret);
+}
 
 void	assign_order(t_coder *coder, t_dongle **first, t_dongle **second)
 {

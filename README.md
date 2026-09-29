@@ -61,13 +61,27 @@ waiting for the next" can close around the ring.
 **Hold and wait** is reduced by checking both dongles jointly. When a coder
 tries to take a dongle, it locks both dongles' mutexes (in the same per-coder
 order) and only proceeds if *both* are available to it: its turn in both
-queues, and both off cooldown. A coder therefore does not grab one dongle
-while the other is clearly unobtainable.
+queues, and both off cooldown. A coder never holds one dongle while waiting for the other.
 
 **Single coder:** with one coder there is only one dongle. The coder can
 never hold two, so it cannot compile. It waits until `time_to_burnout`
 elapses and is reported as burned out, instead of hanging or deadlocking
 on itself.
+
+## Head-of-line blocking prevention (staggered start)
+
+At startup every coder requests dongles at nearly the same moment, and
+all EDF deadlines are equal. Priority then depends on thread timing and
+coder id, which can form a chain where each coder waits behind a
+neighbour who is itself waiting. The whole ring then compiles one coder
+at a time instead of in parallel, which can cause burnouts even with
+feasible parameters.
+
+To avoid this, even-numbered coders wait briefly before their first
+request. Odd-numbered coders are then first in line on all their
+dongles, and since they are never neighbours, they compile in parallel.
+After the first round, EDF keeps this alternation stable: the coders
+who compiled earlier have earlier deadlines and win the next round.
 
 ### Starvation prevention
 

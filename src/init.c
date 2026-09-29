@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/10 12:51:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 09:39:20 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 11:58:54 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ static int	init_dongle(t_data *data_table, int i)
 	data_table->dongles[i].release_time_in_ms = 0;
 	if (data_table->scheduler == FIFO
 		&& init_heap(&data_table->dongles[i].heap, fifo_cmp))
-			return (1);
+		return (1);
 	if (data_table->scheduler == EDF
 		&& init_heap(&data_table->dongles[i].heap, edf_cmp))
 		return (1);
@@ -64,7 +64,6 @@ static int	init_dongle(t_data *data_table, int i)
 		pthread_mutex_destroy(&data_table->dongles[i].mtx);
 		return (fail("Dongle cond init failed.\n"));
 	}
-	data_table->dongles_created++;
 	return (0);
 }
 
@@ -100,6 +99,7 @@ int	codexion_init(t_data *data_table)
 	{
 		if (init_dongle(data_table, i))
 			return (1);
+		data_table->dongles_created++;
 		init_coder(data_table, i);
 	}
 	if (create_table_mutexes(data_table))

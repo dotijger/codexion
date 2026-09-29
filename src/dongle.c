@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/21 17:58:46 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/28 19:29:33 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 12:17:57 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,28 +21,26 @@ static bool	dongle_available(t_coder *coder, t_dongle *dongle)
 
 static void	wait_for_dongles(t_coder *coder, t_dongle *dongle, t_dongle *other)
 {
-	struct timespec	time_ready;
-	struct timespec	time_one;
+	struct timespec	t_ready;
+	struct timespec	t_one;
 	long			time_ready_ms;
 	t_data			*data_table;
 
 	data_table = coder->data_table;
 	while (is_running(coder->data_table) && !(dongle_available(coder, dongle)
-		&& dongle_available(coder, other)))
+			&& dongle_available(coder, other)))
 	{
-		time_ready_ms = min_cooldown(
-				available_at(dongle, data_table->dongle_cooldown),
-				available_at(other, data_table->dongle_cooldown));
+		time_ready_ms = min_wait_time(dongle, other,
+				data_table->dongle_cooldown);
 		pthread_mutex_unlock(&other->mtx);
 		if (my_turn(dongle->heap, coder, dongle))
 		{
-
-			time_ready = ms_to_ts(time_ready_ms);
-			time_one = ms_to_ts(get_time(MILLISECOND) + 1);
+			t_ready = ms_to_ts(time_ready_ms);
+			t_one = ms_to_ts(get_time(MILLISECOND) + 1);
 			if (get_time(MILLISECOND) >= time_ready_ms)
-					pthread_cond_timedwait(&dongle->cond, &dongle->mtx, &time_one);
+				pthread_cond_timedwait(&dongle->cond, &dongle->mtx, &t_one);
 			else
-				pthread_cond_timedwait(&dongle->cond, &dongle->mtx, &time_ready);
+				pthread_cond_timedwait(&dongle->cond, &dongle->mtx, &t_ready);
 		}
 		else
 			pthread_cond_wait(&dongle->cond, &dongle->mtx);

@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 11:37:58 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 11:39:51 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 11:56:05 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int	create_threads(t_data *data_table, int *created, bool *monitor)
 	while (*created < data_table->number_of_coders)
 	{
 		if (pthread_create(&data_table->coders[*created].thread,
-			NULL, &coding_routine, (void *)&data_table->coders[*created]))
+				NULL, &coding_routine, (void *)&data_table->coders[*created]))
 			return (1);
 		(*created)++;
 	}

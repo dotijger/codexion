@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 11:46:26 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 12:03:30 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,13 @@ int	acquire_dongles(t_coder *coder)
 	t_dongle	*first;
 	t_dongle	*second;
 
+	if (coder->compiles == 0 && coder->coder_id % 2 == 0)
+		usleep(1000);
 	assign_order(coder, &first, &second);
 	if (first == second)
 	{
-		log_event(coder->data_table, coder->coder_id + 1, "has taken a dongle\n");
+		log_event(coder->data_table, coder->coder_id + 1,
+			"has taken a dongle\n");
 		while (is_running(coder->data_table))
 			usleep(1000);
 		return (0);

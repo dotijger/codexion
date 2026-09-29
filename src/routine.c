@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 11:51:15 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 12:02:37 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,6 @@ void	*coding_routine(void *arg)
 	data_table = coder->data_table;
 	while (!is_running(data_table) && !has_failed(data_table))
 		usleep(100);
-	if (coder->coder_id % 2 == 0)
-		usleep(1000);
 	while (is_running(data_table)
 		&& coder->compiles < data_table->compiles_required)
 	{

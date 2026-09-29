@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 11:36:49 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 12:16:52 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ void			assign_order(
 					t_dongle **second);
 int				enter_queue(t_coder *coder, t_dongle *first, t_dongle *second);
 long			min_cooldown(long one, long two);
+long			min_wait_time(t_dongle *one, t_dongle *two, long cooldown);
 
 // heap.c
 int				init_heap(t_heap **heap, bool (*cmp)(t_request, t_request));
