@@ -16,7 +16,6 @@ $(NAME): $(OBJ)
 %.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-
 all: $(NAME)
 
 clean:
