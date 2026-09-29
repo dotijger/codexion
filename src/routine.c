@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 16:00:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 10:04:28 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 11:45:50 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@ static bool	burned_out(t_coder *coders)
 		if (!(coders[i].compiles >= coders->data_table->compiles_required)
 			&& now > coders[i].burnout_deadline)
 		{
-			log_event(coders[i].data_table,
-				coders[i].coder_id + 1, "burned out\n");
+			log_burnout(coders[i].data_table, coders[i].coder_id + 1);
 			return (true);
 		}
 	}
@@ -42,6 +41,7 @@ static bool	done(t_coder *coders)
 		if (coders[i].compiles < coders[i].data_table->compiles_required)
 			return (false);
 	}
+	stop_sim(coders->data_table);
 	return (true);
 }
 
@@ -65,21 +65,20 @@ void	*coding_routine(void *arg)
 
 	coder = (t_coder *)arg;
 	data_table = coder->data_table;
-	while (!is_running(data_table) && !data_table->failed)
+	while (!is_running(data_table) && !has_failed(data_table))
 		usleep(100);
-	while (is_running(data_table) && !data_table->failed
+	while (is_running(data_table)
 		&& coder->compiles < data_table->compiles_required)
 	{
 		if (acquire_dongles(coder))
-		{
-			fail_sim(data_table);
 			return (NULL);
-		}
 		if (!is_running(data_table))
 			return (NULL);
 		compile(coder->coder_id,
 			data_table, coder->data_table->time_to_compile);
 		release_dongles(coder);
+		if (coder->compiles == data_table->compiles_required)
+			return (NULL);
 		debug(coder->coder_id, data_table, coder->data_table->time_to_debug);
 		refactor(coder->coder_id,
 			data_table, coder->data_table->time_to_refactor);
@@ -92,18 +91,15 @@ void	*monitor_routine(void *arg)
 	t_data	*data_table;
 
 	data_table = (t_data *)arg;
-	while (!is_running(data_table) && !data_table->failed)
+	while (!is_running(data_table) && !has_failed(data_table))
 		usleep(100);
-	while (is_running(data_table)
-		&& !data_table->failed)
+	while (is_running(data_table))
 	{
 		pthread_mutex_lock(&data_table->table_mtx);
-		if (done(data_table->coders))
-			stop_sim(data_table);
-		else if (burned_out(data_table->coders))
-			stop_sim(data_table);
+		done(data_table->coders);
+		burned_out(data_table->coders);
 		pthread_mutex_unlock(&data_table->table_mtx);
-		if (is_running(data_table))
+		if (is_running(data_table) && !has_failed(data_table))
 			precise_usleep(1000, data_table);
 	}
 	broadcast_to_dongles(data_table);

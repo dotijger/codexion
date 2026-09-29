@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:20:40 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 09:43:33 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 11:36:49 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,10 @@ void			heapify(t_heap *heap, int i);
 // init.c
 int				codexion_init(t_data *data_table);
 
+// log.c
+void			log_event(t_data *data_table, int id, char *event);
+void			log_burnout(t_data *data_table, int id);
+
 // parser.c
 int				parse_input(t_data *data_table, char **av);
 
@@ -167,9 +171,8 @@ bool			fifo_cmp(t_request a, t_request b);
 bool			edf_cmp(t_request a, t_request b);
 
 // sim_utils.c
-void			log_event(t_data *data_table, int id, char *event);
-void			precise_usleep(long usec, t_data *data_table);
 bool			is_running(t_data *data_table);
+bool			has_failed(t_data *data_table);
 void			stop_sim(t_data *data_table);
 void			fail_sim(t_data *data_table);
 
@@ -178,5 +181,6 @@ int				ft_strncmp(const char *s1, const char *s2, int n);
 int				fail(char *exit_msg);
 long			get_time(t_time_format time_code);
 struct timespec	ms_to_ts(long ms);
+void			precise_usleep(long usec, t_data *data_table);
 
 #endif

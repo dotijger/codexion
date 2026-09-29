@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 14:55:09 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 10:17:26 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 11:24:31 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,29 @@ struct timespec	ms_to_ts(long ms)
 	ret_ts.tv_sec = ms / 1000;
 	ret_ts.tv_nsec = (ms % 1000) * 1000000;
 	return (ret_ts);
+}
+
+void	precise_usleep(long usec, t_data *data_table)
+{
+	long	start;
+	long	elapsed;
+	long	rem;
+
+	start = get_time(MICROSECOND);
+	while (get_time(MICROSECOND) - start < usec)
+	{
+		if (!is_running(data_table))
+			break ;
+		elapsed = get_time(MICROSECOND) - start;
+		rem = usec - elapsed;
+		if (rem > 1000)
+		{
+			usleep(rem / 4);
+		}
+		else
+		{
+			while (get_time(MICROSECOND) - start < usec)
+				usleep(50);
+		}
+	}
 }

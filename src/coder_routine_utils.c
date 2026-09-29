@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/14 12:04:51 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 10:06:33 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 11:46:26 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,15 @@ int	acquire_dongles(t_coder *coder)
 		return (0);
 	}
 	if (enter_queue(coder, first, second))
+	{
+		fail_sim(coder->data_table);
 		return (1);
+	}
 	if (take_dongles(coder, first, second))
+	{
+		fail_sim(coder->data_table);
 		return (1);
+	}
 	return (0);
 }
 
