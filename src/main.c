@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/09 13:17:42 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/23 14:09:01 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 10:19:43 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	print_exit_message(void)
 		"  dongle_cooldown              int    ms a dongle stays unusable "
 		"after release\n"
 		"  scheduler                    str    \"fifo\" or \"edf\"\n";
-	fprintf(stderr, "%s", exit_message);
+	fprintf(stderr, RED "%s" RESET, exit_message);
 }
 
 int	main(int ac, char **av)
