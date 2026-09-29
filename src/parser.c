@@ -6,7 +6,7 @@
 /*   By: odschreu <odschreu@student.codam.nl>      ===##====#{####}====##==   */
 /*                                                        |X||##||X|          */
 /*   Created: 2026/09/29 10:07:50 by odschreu             |X||##||X|          */
-/*   Updated: 2026/09/29 10:07:53 by odschreu            ..+::##::+..         */
+/*   Updated: 2026/09/29 10:16:47 by odschreu            ..+::##::+..         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,25 @@
 
 static int	valid_int(char *str)
 {
-	int		i;
+	int		len;
 
-	i = 0;
-	while (*str)
-	{
-		if (*str >= '0' && *str <= '9')
-			i++;
-		else
-			return (fail("Argument must consist of only digits.\n"));
+	len = 0;
+	if (*str == '+')
 		str++;
+	if (!*str)
+		return (fail("Argument must consist of digits.\n"));
+	while (str[len])
+	{
+		if (*str < '0' || *str > '9')
+			return (fail("Argument must consist of only digits.\n"));
+		len++;
 	}
-	if (i == 0)
-		return (fail("Argument must contain digits.\n"));
-	if (i > 10 || (i == 10 && ft_strncmp(start, "2147483647", 10) > 0))
+	while (*str == '0' && str[1])
+	{
+		str++;
+		len--;
+	}
+	if (len > 10 || (len == 10 && ft_strncmp(str, "2147483647", 10) > 0))
 		return (fail("All numeric arguments need to be <= INT_MAX.\n"));
 	return (0);
 }
