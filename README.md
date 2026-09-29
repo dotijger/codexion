@@ -71,7 +71,7 @@ on itself.
 ## Head-of-line blocking prevention (staggered start)
 
 At startup every coder requests dongles at nearly the same moment, and
-all EDF deadlines are equal. Priority then depends on thread timing and
+all EDF and FIFO deadlines are equal. Priority then depends on thread timing and
 coder id, which can form a chain where each coder waits behind a
 neighbour who is itself waiting. The whole ring then compiles one coder
 at a time instead of in parallel, which can cause burnouts even with
@@ -79,9 +79,10 @@ feasible parameters.
 
 To avoid this, even-numbered coders wait briefly before their first
 request. Odd-numbered coders are then first in line on all their
-dongles, and since they are never neighbours, they compile in parallel.
-After the first round, EDF keeps this alternation stable: the coders
-who compiled earlier have earlier deadlines and win the next round.
+dongles, except for the first and last coder -- one of them will block the compile for the other.
+That is expected behavior (for example, 5 coders, coder 1 and 5 can't compile at the same time, at most 2 coders can compile at the same time).
+After the first round, EDF/FIFO keeps this alternation stable: the coders
+who compiled earlier have earlier deadlines or ask for the dongles earlier, and win the next round.
 
 ### Starvation prevention
 
